@@ -32,7 +32,7 @@ public class HttpButlerServer
 
 
 	// INIT
-	@API protected HttpButlerServer(int port)
+	@API public HttpButlerServer(int port)
 	{
 		this.port = port;
 	}
@@ -91,11 +91,13 @@ public class HttpButlerServer
 		HttpRequestHandler handler = handlersByKey.get(key);
 		if(handler == null)
 		{
-			httpResponseSender.sendNotFound("Server can't process method "+request.getMethod()+" on path '"+request.getPath()+"'");
+			httpResponseSender.sendNotFound(
+					"Server can't process method "+request.getMethod()+" on path '"+request.getPath()+"'");
 			logger.warn("Received request {}, no request handler speicified for that request method and type", request);
 			return;
 		}
 
+		logger.debug("Processing request {} in handler {}...", request, handler);
 		handler.handleRequest(request, httpResponseSender);
 	}
 
