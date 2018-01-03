@@ -1,5 +1,7 @@
 package de.domisum.httpbutler;
 
+import de.domisum.httpbutler.exceptions.HttpException;
+import de.domisum.httpbutler.exceptions.MethodNotAllowedHttpException;
 import de.domisum.lib.auxilium.util.PHR;
 import de.domisum.lib.auxilium.util.java.annotations.API;
 import io.undertow.Undertow;
@@ -86,21 +88,32 @@ public class HttpButlerServer
 		handleRequest(request, httpResponseSender);
 	}
 
-	private void handleRequest(HttpRequest request, HttpResponseSender httpResponseSender)
+	private void handleRequest(HttpRequest request, HttpResponseSender responseSender)
+	{
+		try
+		{
+			handleOrThrowHttpException(request, responseSender);
+		}
+		catch(HttpException e)
+		{
+			e.sendError(responseSender);
+		}
+	}
+
+	private void handleOrThrowHttpException(HttpRequest request, HttpResponseSender responseSender) throws HttpException
 	{
 		RequestHandlerKey key = new RequestHandlerKey(request.getMethod(), request.getPath());
 		HttpRequestHandler handler = handlersByKey.get(key);
 		if(handler == null)
 		{
 			logger.warn("Received request {}, no request handler speicified for that request method and type", request);
-			httpResponseSender.sendMethodNotAllowed(PHR.r("Server unable to process method {} on path '{}'",
+			throw new MethodNotAllowedHttpException(PHR.r("Server unable to process method {} on path '{}'",
 					request.getMethod(),
 					request.getPath()));
-			return;
 		}
 
 		logger.debug("Processing request {} in handler {}...", request, handler);
-		handler.handleRequest(request, httpResponseSender);
+		handler.handleRequest(request, responseSender);
 	}
 
 
