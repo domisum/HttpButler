@@ -36,6 +36,12 @@ public class HttpResponseSender
 
 
 	// ERRORS
+	public void sendMethodNotAllowed(String errorMessage)
+	{
+		undertowExchange.setStatusCode(StatusCodes.METHOD_NOT_ALLOWED);
+		sendPlaintext(StatusCodes.METHOD_NOT_ALLOWED_STRING+": "+errorMessage);
+	}
+
 	@API public void sendNotFound(String errorMessage)
 	{
 		undertowExchange.setStatusCode(StatusCodes.NOT_FOUND);

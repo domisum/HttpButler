@@ -1,5 +1,6 @@
 package de.domisum.httpbutler;
 
+import de.domisum.lib.auxilium.util.PHR;
 import de.domisum.lib.auxilium.util.java.annotations.API;
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
@@ -91,9 +92,10 @@ public class HttpButlerServer
 		HttpRequestHandler handler = handlersByKey.get(key);
 		if(handler == null)
 		{
-			httpResponseSender.sendNotFound(
-					"Server can't process method "+request.getMethod()+" on path '"+request.getPath()+"'");
 			logger.warn("Received request {}, no request handler speicified for that request method and type", request);
+			httpResponseSender.sendMethodNotAllowed(PHR.r("Server unable to process method {} on path '{}'",
+					request.getMethod(),
+					request.getPath()));
 			return;
 		}
 
