@@ -7,6 +7,6 @@ import de.domisum.lib.auxilium.util.java.annotations.API;
 public abstract class HttpRequestHandler
 {
 
-	protected abstract void handleRequest(HttpRequest httpRequest, HttpResponseSender httpResponseSender) throws HttpException;
+	protected abstract void handleRequest(HttpRequest request, HttpResponseSender responseSender) throws HttpException;
 
 }
