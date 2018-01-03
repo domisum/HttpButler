@@ -19,21 +19,18 @@ public class HttpResponseSender
 	{
 		undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
 		undertowExchange.getResponseSender().send(text);
-		undertowExchange.endExchange();
 	}
 
 	@API public void sendJson(String json)
 	{
 		undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
 		undertowExchange.getResponseSender().send(json);
-		undertowExchange.endExchange();
 	}
 
 	@API public void sendRaw(byte[] data)
 	{
 		undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/octet-stream");
 		undertowExchange.getResponseSender().send(ByteBuffer.wrap(data));
-		undertowExchange.endExchange();
 	}
 
 
