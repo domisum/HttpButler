@@ -4,6 +4,7 @@ import de.domisum.httpbutler.exceptions.HttpException;
 import de.domisum.httpbutler.exceptions.MethodNotAllowedHttpException;
 import de.domisum.httpbutler.request.HttpMethod;
 import de.domisum.httpbutler.request.HttpRequest;
+import de.domisum.httpbutler.strategy.ArgsInPathRequestHandlingStrategy;
 import de.domisum.httpbutler.strategy.RequestHandlingStrategy;
 import de.domisum.httpbutler.strategy.StaticPathRequestHandlingStrategy;
 import de.domisum.lib.auxilium.contracts.strategy.StrategySelector;
@@ -72,6 +73,11 @@ public class HttpButlerServer
 	@API public synchronized void registerStaticPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
 	{
 		requestHandlingStrategies.add(new StaticPathRequestHandlingStrategy(method, path, handler));
+	}
+
+	@API public synchronized void registerArgsInPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
+	{
+		requestHandlingStrategies.add(new ArgsInPathRequestHandlingStrategy(method, path, handler));
 	}
 
 
