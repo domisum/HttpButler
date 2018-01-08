@@ -14,9 +14,9 @@ public class ArgsInPathRequestHandlingStrategy implements RequestHandlingStrateg
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
+
 	// CONSTANTS
 	private static final String PARAMETER_REGEX = "[0-9a-zA-Z-_%]+";
-
 
 	// ATTRIBUTES
 	private final HttpMethod httpMethod;
