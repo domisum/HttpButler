@@ -2,12 +2,14 @@ package de.domisum.httpbutler;
 
 import de.domisum.httpbutler.exceptions.HttpException;
 import de.domisum.httpbutler.exceptions.MethodNotAllowedHttpException;
+import de.domisum.httpbutler.strategy.RequestHandlingStrategy;
+import de.domisum.httpbutler.strategy.StaticPathRequestHandlingStrategy;
+import de.domisum.lib.auxilium.contracts.strategy.StrategySelector;
 import de.domisum.lib.auxilium.util.PHR;
 import de.domisum.lib.auxilium.util.java.annotations.API;
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
 import io.undertow.server.HttpServerExchange;
-import lombok.EqualsAndHashCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 @API
 public class HttpButlerServer
@@ -28,7 +31,9 @@ public class HttpButlerServer
 
 	// SETTINGS
 	private final int port;
-	private final Map<RequestHandlerKey, HttpRequestHandler> handlersByKey = new HashMap<>();
+
+	private final List<RequestHandlingStrategy> requestHandlingStrategies = new ArrayList<>();
+	private final RequestHandlingStrategy defaultHandlingStrategy = null;
 
 	// SERVER
 	private Undertow server;
@@ -62,9 +67,9 @@ public class HttpButlerServer
 
 
 	// REQUEST HANDLERS
-	@API public synchronized void registerRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
+	@API public synchronized void registerStaticPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
 	{
-		handlersByKey.put(new RequestHandlerKey(method, path), handler);
+		requestHandlingStrategies.add(new StaticPathRequestHandlingStrategy(method, path, handler));
 	}
 
 
@@ -102,9 +107,8 @@ public class HttpButlerServer
 
 	private void handleOrThrowHttpException(HttpRequest request, HttpResponseSender responseSender) throws HttpException
 	{
-		RequestHandlerKey key = new RequestHandlerKey(request.getMethod(), request.getPath());
-		HttpRequestHandler handler = handlersByKey.get(key);
-		if(handler == null)
+		Optional<HttpRequestHandler> handlerOptional = selectRequestHandler(request);
+		if(!handlerOptional.isPresent())
 		{
 			logger.warn("Received request {}, no request handler speicified for that request method and type", request);
 			throw new MethodNotAllowedHttpException(PHR.r("Server unable to process method {} on path '{}'",
@@ -112,25 +116,19 @@ public class HttpButlerServer
 					request.getPath()));
 		}
 
-		logger.debug("Processing request {} in handler {}...", request, handler);
-		handler.handleRequest(request, responseSender);
+		logger.debug("Processing request {} in handler {}...", request, handlerOptional);
+		handlerOptional.get().handleRequest(request, responseSender);
 	}
 
-
-	@EqualsAndHashCode
-	private static class RequestHandlerKey
+	private Optional<HttpRequestHandler> selectRequestHandler(HttpRequest httpRequest)
 	{
+		StrategySelector<HttpRequest, RequestHandlingStrategy> selector = new StrategySelector<>(defaultHandlingStrategy,
+				requestHandlingStrategies);
 
-		private final HttpMethod method;
-		private final String path;
-
-
-		public RequestHandlerKey(HttpMethod method, String path)
-		{
-			this.method = method;
-			this.path = path.toLowerCase();
-		}
-
+		Optional<RequestHandlingStrategy> requestHandlingStrategyOptional = selector.selectFor(httpRequest);
+		return requestHandlingStrategyOptional.isPresent() ?
+				Optional.ofNullable(requestHandlingStrategyOptional.get().getHandler()) :
+				Optional.empty();
 	}
 
 }
