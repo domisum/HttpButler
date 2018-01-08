@@ -1,4 +1,4 @@
-package de.domisum.httpbutler;
+package de.domisum.httpbutler.request;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

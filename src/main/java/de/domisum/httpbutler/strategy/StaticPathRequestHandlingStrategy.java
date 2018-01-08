@@ -1,8 +1,8 @@
 package de.domisum.httpbutler.strategy;
 
-import de.domisum.httpbutler.HttpMethod;
-import de.domisum.httpbutler.HttpRequest;
 import de.domisum.httpbutler.HttpRequestHandler;
+import de.domisum.httpbutler.request.HttpMethod;
+import de.domisum.httpbutler.request.HttpRequest;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

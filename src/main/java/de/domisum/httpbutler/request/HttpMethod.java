@@ -1,4 +1,4 @@
-package de.domisum.httpbutler;
+package de.domisum.httpbutler.request;
 
 public enum HttpMethod
 {

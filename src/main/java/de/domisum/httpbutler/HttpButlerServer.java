@@ -2,6 +2,8 @@ package de.domisum.httpbutler;
 
 import de.domisum.httpbutler.exceptions.HttpException;
 import de.domisum.httpbutler.exceptions.MethodNotAllowedHttpException;
+import de.domisum.httpbutler.request.HttpMethod;
+import de.domisum.httpbutler.request.HttpRequest;
 import de.domisum.httpbutler.strategy.RequestHandlingStrategy;
 import de.domisum.httpbutler.strategy.StaticPathRequestHandlingStrategy;
 import de.domisum.lib.auxilium.contracts.strategy.StrategySelector;
