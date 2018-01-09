@@ -19,6 +19,11 @@ public class BadRequestHttpException extends HttpException
 		super(message);
 	}
 
+	@API public BadRequestHttpException(String message, Throwable t)
+	{
+		this(message+" "+t);
+	}
+
 
 	// ERROR
 	@Override public void sendError(HttpResponseSender responseSender)

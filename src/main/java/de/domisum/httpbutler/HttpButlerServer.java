@@ -8,10 +8,12 @@ import de.domisum.httpbutler.strategy.ArgsInPathRequestHandlingStrategy;
 import de.domisum.httpbutler.strategy.RequestHandlingStrategy;
 import de.domisum.httpbutler.strategy.StaticPathRequestHandlingStrategy;
 import de.domisum.lib.auxilium.contracts.strategy.StrategySelector;
+import de.domisum.lib.auxilium.util.IOUtil;
 import de.domisum.lib.auxilium.util.PHR;
 import de.domisum.lib.auxilium.util.java.annotations.API;
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
+import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 @API
-public class HttpButlerServer
+public class HttpButlerServer implements HttpHandler
 {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -56,7 +58,7 @@ public class HttpButlerServer
 		logger.info("Starting {}...", getClass().getSimpleName());
 
 		Builder serverBuilder = Undertow.builder();
-		serverBuilder.addHttpListener(port, "localhost", this::handleRequest);
+		serverBuilder.addHttpListener(port, "localhost", this);
 		server = serverBuilder.build();
 
 		server.start();
@@ -82,7 +84,15 @@ public class HttpButlerServer
 
 
 	// REQUEST
-	private synchronized void handleRequest(HttpServerExchange exchange)
+	@Override public synchronized void handleRequest(HttpServerExchange exchange)
+	{
+		if(exchange.isInIoThread())
+			exchange.dispatch(this);
+		else
+			handleRequest(buildHttpRequest(exchange), new HttpResponseSender(exchange));
+	}
+
+	private HttpRequest buildHttpRequest(HttpServerExchange exchange)
 	{
 		// method
 		HttpMethod method = HttpMethod.fromName(exchange.getRequestMethod().toString());
@@ -90,16 +100,19 @@ public class HttpButlerServer
 		// path
 		String requestPath = exchange.getRequestPath();
 
+		// body
+		exchange.startBlocking();
+		byte[] body = IOUtil.toByteArray(exchange.getInputStream());
+
 		// params
 		Map<String, List<String>> queryParams = new HashMap<>();
 		for(Entry<String, Deque<String>> entry : exchange.getQueryParameters().entrySet())
 			queryParams.put(entry.getKey(), Collections.unmodifiableList(new ArrayList<>(entry.getValue())));
 
 
-		HttpRequest request = new HttpRequest(method, requestPath, queryParams);
-		HttpResponseSender httpResponseSender = new HttpResponseSender(exchange);
-		handleRequest(request, httpResponseSender);
+		return new HttpRequest(method, requestPath, body, queryParams);
 	}
+
 
 	private void handleRequest(HttpRequest request, HttpResponseSender responseSender)
 	{

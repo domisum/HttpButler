@@ -40,7 +40,7 @@ public class ArgsInPathRequestHandlingStrategyTest
 	// ARRANGE
 	private HttpRequest requestFromMethodAndPath(HttpMethod method, String path)
 	{
-		return new HttpRequest(method, path, new HashMap<>());
+		return new HttpRequest(method, path, new byte[] {}, new HashMap<>());
 	}
 
 

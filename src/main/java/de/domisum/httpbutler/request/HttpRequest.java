@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +19,11 @@ public class HttpRequest
 
 	@Getter private final HttpMethod method;
 	@Getter private final String path;
+	private final byte[] body;
 	@Getter private final Map<String, List<String>> queryParameters;
 
 
+	// PATH
 	@API public String getPathSegment(int segmentIndex) throws BadRequestHttpException
 	{
 		String[] pathSplit = path.split(StringUtil.escapeStringForRegex("/"));
@@ -46,6 +49,13 @@ public class HttpRequest
 			throw new BadRequestHttpException(PHR.r("path segment on index {} supposed to be integer, was {}",
 					pathSegmentString));
 		}
+	}
+
+
+	// BODY
+	@API public String getBodyAsString()
+	{
+		return new String(body, StandardCharsets.UTF_8);
 	}
 
 }
