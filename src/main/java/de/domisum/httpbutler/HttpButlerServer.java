@@ -38,7 +38,7 @@ public class HttpButlerServer implements HttpHandler
 	private final int port;
 
 	private final List<RequestHandlingStrategy> requestHandlingStrategies = new ArrayList<>();
-	private final RequestHandlingStrategy defaultHandlingStrategy = null;
+	private final RequestHandlingStrategy fallbackHandlingStrategy = null; // TODO
 
 	// SERVER
 	private Undertow server;
@@ -143,10 +143,10 @@ public class HttpButlerServer implements HttpHandler
 
 	private Optional<HttpRequestHandler> selectRequestHandler(HttpRequest httpRequest)
 	{
-		StrategySelector<HttpRequest, RequestHandlingStrategy> selector = new StrategySelector<>(defaultHandlingStrategy,
-				requestHandlingStrategies);
+		StrategySelector<HttpRequest, RequestHandlingStrategy> selector = new StrategySelector<>(requestHandlingStrategies,
+				fallbackHandlingStrategy);
 
-		Optional<RequestHandlingStrategy> requestHandlingStrategyOptional = selector.selectFor(httpRequest);
+		Optional<RequestHandlingStrategy> requestHandlingStrategyOptional = selector.selectFirstApplicable(httpRequest);
 		return requestHandlingStrategyOptional.isPresent() ?
 				Optional.ofNullable(requestHandlingStrategyOptional.get().getHandler()) :
 				Optional.empty();
