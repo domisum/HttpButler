@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 @API
-public class HttpButlerServer implements HttpHandler
+public class HttpButlerServer
 {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -58,7 +58,7 @@ public class HttpButlerServer implements HttpHandler
 		logger.info("Starting {}...", getClass().getSimpleName());
 
 		Builder serverBuilder = Undertow.builder();
-		serverBuilder.addHttpListener(port, "localhost", this);
+		serverBuilder.addHttpListener(port, "localhost", new HttpButlerServerHttpHandler());
 		server = serverBuilder.build();
 
 		server.start();
@@ -84,17 +84,6 @@ public class HttpButlerServer implements HttpHandler
 
 
 	// REQUEST
-	@Override public synchronized void handleRequest(HttpServerExchange exchange)
-	{
-		if(exchange.isInIoThread())
-		{
-			exchange.dispatch(this);
-			return;
-		}
-
-		handleRequest(buildHttpRequest(exchange), new HttpResponseSender(exchange));
-	}
-
 	private HttpRequest buildHttpRequest(HttpServerExchange exchange)
 	{
 		// method
@@ -115,7 +104,6 @@ public class HttpButlerServer implements HttpHandler
 
 		return new HttpRequest(method, requestPath, body, queryParams);
 	}
-
 
 	private void handleRequest(HttpRequest request, HttpResponseSender responseSender)
 	{
@@ -153,6 +141,26 @@ public class HttpButlerServer implements HttpHandler
 		return requestHandlingStrategyOptional.isPresent() ?
 				Optional.ofNullable(requestHandlingStrategyOptional.get().getHandler()) :
 				Optional.empty();
+	}
+
+
+	// UNDERTOW HANDLER
+	private class HttpButlerServerHttpHandler implements HttpHandler
+	{
+		@Override public synchronized void handleRequest(HttpServerExchange exchange)
+		{
+			if(exchange.isInIoThread())
+			{
+				exchange.dispatch(this);
+				return;
+			}
+
+			HttpRequest request = buildHttpRequest(exchange);
+			HttpResponseSender responseSender = new HttpResponseSender(exchange);
+
+			HttpButlerServer.this.handleRequest(request, responseSender);
+		}
+
 	}
 
 }
