@@ -1,5 +1,6 @@
 package de.domisum.httpbutler.request;
 
+import com.google.common.collect.Iterables;
 import de.domisum.httpbutler.exceptions.BadRequestHttpException;
 import de.domisum.lib.auxilium.util.PHR;
 import de.domisum.lib.auxilium.util.StringUtil;
@@ -56,6 +57,25 @@ public class HttpRequest
 	@API public String getBodyAsString()
 	{
 		return new String(body, StandardCharsets.UTF_8);
+	}
+
+
+	// PARAMETERS
+	@API public List<String> getParameterValues(String key) throws BadRequestHttpException
+	{
+		if(!queryParameters.containsKey(key))
+			throw new BadRequestHttpException(PHR.r("request is missing query parameter with key '{}'", key));
+
+		return queryParameters.get(key);
+	}
+
+	@API public String getParameterValue(String key) throws BadRequestHttpException
+	{
+		List<String> parameterValues = getParameterValues(key);
+		if(parameterValues.size() > 1)
+			throw new BadRequestHttpException(PHR.r("request contained multiple values for parameter '{}', must be one", key));
+
+		return Iterables.getOnlyElement(parameterValues);
 	}
 
 }
