@@ -87,9 +87,12 @@ public class HttpButlerServer implements HttpHandler
 	@Override public synchronized void handleRequest(HttpServerExchange exchange)
 	{
 		if(exchange.isInIoThread())
+		{
 			exchange.dispatch(this);
-		else
-			handleRequest(buildHttpRequest(exchange), new HttpResponseSender(exchange));
+			return;
+		}
+
+		handleRequest(buildHttpRequest(exchange), new HttpResponseSender(exchange));
 	}
 
 	private HttpRequest buildHttpRequest(HttpServerExchange exchange)
