@@ -51,7 +51,7 @@ public class HttpButlerServer
 	}
 
 
-	@API public void start()
+	@API public synchronized void start()
 	{
 		if(server != null)
 			return;
@@ -64,9 +64,12 @@ public class HttpButlerServer
 		server.start();
 	}
 
-	@API public void stop()
+	@API public synchronized void stop()
 	{
+		if(server == null)
+			return;
 		logger.info("Stopping {}...", getClass().getSimpleName());
+
 		server.stop();
 	}
 
@@ -125,7 +128,8 @@ public class HttpButlerServer
 			logger.warn("Received request {}, no request handler speicified for that request method and type", request);
 			throw new MethodNotAllowedHttpException(PHR.r("Server unable to process method {} on path '{}'",
 					request.getMethod(),
-					request.getPath()));
+					request.getPath()
+			));
 		}
 
 		logger.debug("Processing request {} in handler {}...", request, handlerOptional);
@@ -135,7 +139,8 @@ public class HttpButlerServer
 	private Optional<HttpRequestHandler> selectRequestHandler(HttpRequest httpRequest)
 	{
 		StrategySelector<HttpRequest, RequestHandlingStrategy> selector = new StrategySelector<>(requestHandlingStrategies,
-				fallbackHandlingStrategy);
+				fallbackHandlingStrategy
+		);
 
 		Optional<RequestHandlingStrategy> requestHandlingStrategyOptional = selector.selectFirstApplicable(httpRequest);
 		return requestHandlingStrategyOptional.isPresent() ?
