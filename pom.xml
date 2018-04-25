@@ -14,8 +14,8 @@
 
 	<repositories>
 		<repository>
-			<id>domisum-de</id>
-			<name>domisum-de</name>
+			<id>domisum-de-public</id>
+			<name>domisum-de-public</name>
 			<url>http://domisum.de:8081/nexus/content/repositories/public/</url>
 			<snapshots>
 				<enabled>true</enabled>
