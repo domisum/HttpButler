@@ -35,6 +35,7 @@ public class HttpButlerServer
 
 
 	// SETTINGS
+	private final String host;
 	private final int port;
 
 	private final List<RequestHandlingStrategy> requestHandlingStrategies = new ArrayList<>();
@@ -45,8 +46,9 @@ public class HttpButlerServer
 
 
 	// INIT
-	@API public HttpButlerServer(int port)
+	@API public HttpButlerServer(String host, int port)
 	{
+		this.host = host;
 		this.port = port;
 	}
 
@@ -58,7 +60,7 @@ public class HttpButlerServer
 		logger.info("Starting {}...", getClass().getSimpleName());
 
 		Builder serverBuilder = Undertow.builder();
-		serverBuilder.addHttpListener(port, "localhost", new HttpButlerServerHttpHandler());
+		serverBuilder.addHttpListener(port, host, new HttpButlerServerHttpHandler());
 		server = serverBuilder.build();
 
 		server.start();
