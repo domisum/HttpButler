@@ -2,6 +2,7 @@ package de.domisum.httpbutler;
 
 import de.domisum.httpbutler.exceptions.HttpException;
 import de.domisum.httpbutler.exceptions.MethodNotAllowedHttpException;
+import de.domisum.httpbutler.preprocessor.HttpRequestPreprocessor;
 import de.domisum.httpbutler.request.HttpMethod;
 import de.domisum.httpbutler.request.HttpRequest;
 import de.domisum.httpbutler.strategy.ArgsInPathRequestHandlingStrategy;
@@ -41,6 +42,8 @@ public class HttpButlerServer
 	private final List<RequestHandlingStrategy> requestHandlingStrategies = new ArrayList<>();
 	private final RequestHandlingStrategy fallbackHandlingStrategy = null; // TODO
 
+	private final List<HttpRequestPreprocessor> requestPreprocessors = new ArrayList<>();
+
 	// SERVER
 	private Undertow server;
 
@@ -76,7 +79,7 @@ public class HttpButlerServer
 	}
 
 
-	// REQUEST HANDLERS
+	// HANDLERS REGISTRATION
 	@API public synchronized void registerStaticPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
 	{
 		requestHandlingStrategies.add(new StaticPathRequestHandlingStrategy(method, path, handler));
@@ -85,6 +88,11 @@ public class HttpButlerServer
 	@API public synchronized void registerArgsInPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
 	{
 		requestHandlingStrategies.add(new ArgsInPathRequestHandlingStrategy(method, path, handler));
+	}
+
+	@API public synchronized void registerRequestPreprocessor(HttpRequestPreprocessor requestPreprocessor)
+	{
+		requestPreprocessors.add(requestPreprocessor);
 	}
 
 
@@ -110,7 +118,7 @@ public class HttpButlerServer
 		return new HttpRequest(method, requestPath, body, queryParams);
 	}
 
-	private void handleRequest(HttpRequest request, HttpResponseSender responseSender)
+	private synchronized void handleRequest(HttpRequest request, HttpResponseSender responseSender)
 	{
 		try
 		{
@@ -122,10 +130,31 @@ public class HttpButlerServer
 		}
 	}
 
-	private void handleOrThrowHttpException(HttpRequest request, HttpResponseSender responseSender) throws HttpException
+	private void handleOrThrowHttpException(HttpRequest rawRequest, HttpResponseSender responseSender) throws HttpException
 	{
-		Optional<HttpRequestHandler> handlerOptional = selectRequestHandler(request);
-		if(!handlerOptional.isPresent())
+		HttpRequest request = preprocessRequest(rawRequest);
+
+		HttpRequestHandler requestHandler = selectRequestHandler(request);
+		logger.debug("Processing request {} in handler {}...", request, requestHandler);
+		requestHandler.handleRequest(request, responseSender);
+	}
+
+	private HttpRequest preprocessRequest(HttpRequest rawRequest) throws HttpException
+	{
+		HttpRequest r = rawRequest;
+		for(HttpRequestPreprocessor rpp : requestPreprocessors)
+			r = rpp.preprocess(r);
+
+		return r;
+	}
+
+	private HttpRequestHandler selectRequestHandler(HttpRequest request) throws MethodNotAllowedHttpException
+	{
+		Optional<RequestHandlingStrategy> handlingStrategy = new StrategySelector<>(requestHandlingStrategies,
+				fallbackHandlingStrategy
+		).selectFirstApplicable(request);
+
+		if(!handlingStrategy.isPresent())
 		{
 			logger.warn("Received request {}, no request handler speicified for that request method and type", request);
 			throw new MethodNotAllowedHttpException(PHR.r("Server unable to process method {} on path '{}'",
@@ -134,27 +163,15 @@ public class HttpButlerServer
 			));
 		}
 
-		logger.debug("Processing request {} in handler {}...", request, handlerOptional);
-		handlerOptional.get().handleRequest(request, responseSender);
-	}
-
-	private Optional<HttpRequestHandler> selectRequestHandler(HttpRequest httpRequest)
-	{
-		StrategySelector<HttpRequest, RequestHandlingStrategy> selector = new StrategySelector<>(requestHandlingStrategies,
-				fallbackHandlingStrategy
-		);
-
-		Optional<RequestHandlingStrategy> requestHandlingStrategyOptional = selector.selectFirstApplicable(httpRequest);
-		return requestHandlingStrategyOptional.isPresent() ?
-				Optional.ofNullable(requestHandlingStrategyOptional.get().getHandler()) :
-				Optional.empty();
+		return handlingStrategy.get().getHandler();
 	}
 
 
 	// UNDERTOW HANDLER
 	private class HttpButlerServerHttpHandler implements HttpHandler
 	{
-		@Override public synchronized void handleRequest(HttpServerExchange exchange)
+
+		@Override public void handleRequest(HttpServerExchange exchange)
 		{
 			if(exchange.isInIoThread())
 			{
