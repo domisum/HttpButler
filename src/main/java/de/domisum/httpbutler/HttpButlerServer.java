@@ -111,15 +111,15 @@ public class HttpButlerServer
 		byte[] body = IOUtil.toByteArray(exchange.getInputStream());
 
 		// headers
-		Map<String, List<String>> headerValues = new HashMap<>();
+		Map<String, List<String>> headers = new HashMap<>();
 		for(HeaderValues h : exchange.getRequestHeaders())
 		{
 			String headerName = h.getHeaderName().toString();
 			List<String> values = Collections.unmodifiableList(new ArrayList<>(h));
 
-			headerValues.put(headerName, values);
+			headers.put(headerName, values);
 		}
-		headerValues = Collections.unmodifiableMap(headerValues);
+		headers = Collections.unmodifiableMap(headers);
 
 		// params
 		Map<String, List<String>> queryParams = new HashMap<>();
@@ -128,7 +128,7 @@ public class HttpButlerServer
 		queryParams = Collections.unmodifiableMap(queryParams);
 
 
-		return new HttpRequest(method, requestPath, headerValues, queryParams, body);
+		return new HttpRequest(method, requestPath, headers, queryParams, body);
 	}
 
 	private synchronized void handleRequest(HttpRequest request, HttpResponseSender responseSender)
