@@ -16,6 +16,7 @@ import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.HeaderValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,13 +110,25 @@ public class HttpButlerServer
 		exchange.startBlocking();
 		byte[] body = IOUtil.toByteArray(exchange.getInputStream());
 
+		// headers
+		Map<String, List<String>> headerValues = new HashMap<>();
+		for(HeaderValues h : exchange.getRequestHeaders())
+		{
+			String headerName = h.getHeaderName().toString();
+			List<String> values = Collections.unmodifiableList(new ArrayList<>(h));
+
+			headerValues.put(headerName, values);
+		}
+		headerValues = Collections.unmodifiableMap(headerValues);
+
 		// params
 		Map<String, List<String>> queryParams = new HashMap<>();
 		for(Entry<String, Deque<String>> entry : exchange.getQueryParameters().entrySet())
 			queryParams.put(entry.getKey(), Collections.unmodifiableList(new ArrayList<>(entry.getValue())));
+		queryParams = Collections.unmodifiableMap(queryParams);
 
 
-		return new HttpRequest(method, requestPath, body, queryParams);
+		return new HttpRequest(method, requestPath, headerValues, queryParams, body);
 	}
 
 	private synchronized void handleRequest(HttpRequest request, HttpResponseSender responseSender)

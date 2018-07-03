@@ -30,17 +30,19 @@ public class ArgsInPathRequestHandlingStrategyTest
 	{
 		Strategy<HttpRequest> strategy = new ArgsInPathRequestHandlingStrategy(HttpMethod.PUT,
 				"/observer-mode/rest/consumer/getGameMetaData/#/#/#/token",
-				null);
+				null
+		);
 
 		assertDoesApplyTo(strategy,
-				requestFromMethodAndPath(HttpMethod.PUT, "/observer-mode/rest/consumer/getGameMetaData/NA1/3407553715/0/token"));
+				requestFromMethodAndPath(HttpMethod.PUT, "/observer-mode/rest/consumer/getGameMetaData/NA1/3407553715/0/token")
+		);
 	}
 
 
 	// ARRANGE
 	private HttpRequest requestFromMethodAndPath(HttpMethod method, String path)
 	{
-		return new HttpRequest(method, path, new byte[] {}, new HashMap<>());
+		return new HttpRequest(method, path, new HashMap<>(), new HashMap<>(), new byte[] {});
 	}
 
 

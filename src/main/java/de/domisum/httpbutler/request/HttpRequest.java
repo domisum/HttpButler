@@ -20,8 +20,9 @@ public class HttpRequest
 
 	@Getter private final HttpMethod method;
 	@Getter private final String path;
-	private final byte[] body;
+	@Getter private final Map<String, List<String>> headers;
 	@Getter private final Map<String, List<String>> queryParameters;
+	@Getter private final byte[] body;
 
 
 	// PATH
@@ -48,17 +49,29 @@ public class HttpRequest
 		catch(NumberFormatException ignored)
 		{
 			throw new BadRequestHttpException(PHR.r("path segment on index {} supposed to be integer, was {}",
-					pathSegmentString));
+					pathSegmentString
+			));
 		}
 	}
 
 
-	// BODY
-	@API public String getBodyAsString()
+	// HEADERS
+	@API public List<String> getHeaderValues(String key) throws BadRequestHttpException
 	{
-		return new String(body, StandardCharsets.UTF_8);
+		if(!headers.containsKey(key))
+			throw new BadRequestHttpException(PHR.r("request is missing header with key '{}'", key));
+
+		return headers.get(key);
 	}
 
+	@API public String getHeaderValue(String key) throws BadRequestHttpException
+	{
+		List<String> headerValues = getHeaderValues(key);
+		if(headerValues.size() > 1)
+			throw new BadRequestHttpException(PHR.r("request contained multiple values for header '{}', must be one", key));
+
+		return Iterables.getOnlyElement(headerValues);
+	}
 
 	// PARAMETERS
 	@API public List<String> getParameterValues(String key) throws BadRequestHttpException
@@ -76,6 +89,12 @@ public class HttpRequest
 			throw new BadRequestHttpException(PHR.r("request contained multiple values for parameter '{}', must be one", key));
 
 		return Iterables.getOnlyElement(parameterValues);
+	}
+
+	// BODY
+	@API public String getBodyAsString()
+	{
+		return new String(body, StandardCharsets.UTF_8);
 	}
 
 }
