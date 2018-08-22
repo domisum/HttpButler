@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @ToString
-public class HttpRequest
+public class HttpRequest implements AutoCloseable
 {
 
 	@Getter private final HttpMethod method;
@@ -98,6 +98,11 @@ public class HttpRequest
 	@API public String getBodyAsString() throws IOException
 	{
 		return IOUtils.toString(body, StandardCharsets.UTF_8);
+	}
+
+	@Override public void close() throws IOException
+	{
+		body.close();
 	}
 
 }

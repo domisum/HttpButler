@@ -19,6 +19,7 @@ import io.undertow.util.HeaderValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -184,7 +185,7 @@ public class HttpButlerServer
 	private class HttpButlerServerHttpHandler implements HttpHandler
 	{
 
-		@Override public void handleRequest(HttpServerExchange exchange)
+		@Override public void handleRequest(HttpServerExchange exchange) throws IOException
 		{
 			if(exchange.isInIoThread())
 			{
@@ -192,10 +193,11 @@ public class HttpButlerServer
 				return;
 			}
 
-			HttpRequest request = buildHttpRequest(exchange);
-			HttpResponseSender responseSender = new HttpResponseSender(exchange);
-
-			HttpButlerServer.this.handleRequest(request, responseSender);
+			try(HttpRequest request = buildHttpRequest(exchange))
+			{
+				HttpResponseSender responseSender = new HttpResponseSender(exchange);
+				HttpButlerServer.this.handleRequest(request, responseSender);
+			}
 		}
 
 	}
