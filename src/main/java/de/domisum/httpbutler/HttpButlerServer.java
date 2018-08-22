@@ -132,7 +132,7 @@ public class HttpButlerServer
 		return new HttpRequest(method, requestPath, headers, queryParams, body);
 	}
 
-	private synchronized void handleRequest(HttpRequest request, HttpResponseSender responseSender)
+	private synchronized void handleRequest(HttpRequest request, HttpResponseSender responseSender) throws IOException
 	{
 		try
 		{
@@ -144,7 +144,8 @@ public class HttpButlerServer
 		}
 	}
 
-	private void handleOrThrowHttpException(HttpRequest rawRequest, HttpResponseSender responseSender) throws HttpException
+	private void handleOrThrowHttpException(HttpRequest rawRequest, HttpResponseSender responseSender)
+			throws HttpException, IOException
 	{
 		HttpRequest request = preprocessRequest(rawRequest);
 
