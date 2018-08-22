@@ -6,6 +6,7 @@ import de.domisum.lib.auxilium.contracts.strategy.Strategy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 
 public class ArgsInPathRequestHandlingStrategyTest
@@ -42,7 +43,7 @@ public class ArgsInPathRequestHandlingStrategyTest
 	// ARRANGE
 	private HttpRequest requestFromMethodAndPath(HttpMethod method, String path)
 	{
-		return new HttpRequest(method, path, new HashMap<>(), new HashMap<>(), new byte[] {});
+		return new HttpRequest(method, path, new HashMap<>(), new HashMap<>(), new ByteArrayInputStream(new byte[] {}));
 	}
 
 

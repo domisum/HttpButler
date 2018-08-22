@@ -9,7 +9,6 @@ import de.domisum.httpbutler.strategy.ArgsInPathRequestHandlingStrategy;
 import de.domisum.httpbutler.strategy.RequestHandlingStrategy;
 import de.domisum.httpbutler.strategy.StaticPathRequestHandlingStrategy;
 import de.domisum.lib.auxilium.contracts.strategy.StrategySelector;
-import de.domisum.lib.auxilium.util.IOUtil;
 import de.domisum.lib.auxilium.util.PHR;
 import de.domisum.lib.auxilium.util.java.annotations.API;
 import io.undertow.Undertow;
@@ -20,6 +19,7 @@ import io.undertow.util.HeaderValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
@@ -108,7 +108,7 @@ public class HttpButlerServer
 
 		// body
 		exchange.startBlocking();
-		byte[] body = IOUtil.toByteArray(exchange.getInputStream());
+		InputStream body = exchange.getInputStream();
 
 		// headers
 		Map<String, List<String>> headers = new HashMap<>();

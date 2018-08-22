@@ -8,7 +8,10 @@ import de.domisum.lib.auxilium.util.java.annotations.API;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +25,7 @@ public class HttpRequest
 	@Getter private final String path;
 	@Getter private final Map<String, List<String>> headers;
 	@Getter private final Map<String, List<String>> queryParameters;
-	@Getter private final byte[] body;
+	@Getter private final InputStream body;
 
 
 	// PATH
@@ -92,9 +95,9 @@ public class HttpRequest
 	}
 
 	// BODY
-	@API public String getBodyAsString()
+	@API public String getBodyAsString() throws IOException
 	{
-		return new String(body, StandardCharsets.UTF_8);
+		return IOUtils.toString(body, StandardCharsets.UTF_8);
 	}
 
 }
