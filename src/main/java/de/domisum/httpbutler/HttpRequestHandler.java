@@ -6,8 +6,6 @@ import de.domisum.lib.auxilium.util.java.annotations.API;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 @API
 public abstract class HttpRequestHandler
 {
@@ -16,7 +14,6 @@ public abstract class HttpRequestHandler
 
 
 	// HANDLER
-	protected abstract void handleRequest(HttpRequest request, HttpResponseSender responseSender)
-			throws HttpException, IOException;
+	protected abstract void handleRequest(HttpRequest request, HttpResponseSender responseSender) throws HttpException;
 
 }
