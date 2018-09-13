@@ -19,6 +19,11 @@ public class InternalServerErrorHttpException extends HttpException
 		super(message);
 	}
 
+	@API public InternalServerErrorHttpException(Exception e)
+	{
+		this(e.getClass().getName()+": "+e.getMessage());
+	}
+
 
 	// ERROR
 	@Override public void sendError(HttpResponseSender responseSender)
