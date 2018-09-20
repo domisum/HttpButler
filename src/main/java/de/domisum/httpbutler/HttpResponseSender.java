@@ -3,6 +3,7 @@ package de.domisum.httpbutler;
 import de.domisum.lib.auxilium.util.java.annotations.API;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import io.undertow.util.HttpString;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.ByteBuffer;
@@ -38,6 +39,13 @@ public class HttpResponseSender
 	@API public void setStatusCode(int statusCode)
 	{
 		undertowExchange.setStatusCode(statusCode);
+	}
+
+
+	// MISC
+	public void addHeader(String key, String value)
+	{
+		undertowExchange.getResponseHeaders().put(new HttpString(key), value);
 	}
 
 }
