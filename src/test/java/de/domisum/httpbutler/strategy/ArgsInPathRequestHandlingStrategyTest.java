@@ -2,6 +2,7 @@ package de.domisum.httpbutler.strategy;
 
 import de.domisum.httpbutler.request.HttpMethod;
 import de.domisum.httpbutler.request.HttpRequest;
+import de.domisum.httpbutler.strategy.strategies.ArgsInPathRequestHandlingStrategy;
 import de.domisum.lib.auxilium.contracts.strategy.Strategy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -34,6 +34,12 @@ public class HttpResponseSender
 		undertowExchange.getResponseSender().send(ByteBuffer.wrap(data));
 	}
 
+	@API public void sendRawWithType(byte[] data, String contentType)
+	{
+		undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType);
+		undertowExchange.getResponseSender().send(ByteBuffer.wrap(data));
+	}
+
 
 	// ERRORS
 	@API public void setStatusCode(int statusCode)
