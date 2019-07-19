@@ -128,7 +128,7 @@ public class HttpButlerServer
 		Map<String, List<String>> headers = new HashMap<>();
 		for(HeaderValues h : exchange.getRequestHeaders())
 		{
-			String headerName = h.getHeaderName().toString();
+			String headerName = h.getHeaderName().toString().toLowerCase();
 			List<String> values = Collections.unmodifiableList(new ArrayList<>(h));
 
 			headers.put(headerName, values);
