@@ -15,21 +15,28 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @ToString
 public class HttpRequest implements AutoCloseable
 {
 
-	@Getter private final HttpMethod method;
-	@Getter private final String path;
-	@Getter private final Map<String, List<String>> headers;
-	@Getter private final Map<String, List<String>> queryParameters;
-	@Getter private final InputStream body;
+	@Getter
+	private final HttpMethod method;
+	@Getter
+	private final String path;
+	@Getter
+	private final Map<String, List<String>> headers;
+	@Getter
+	private final Map<String, List<String>> queryParameters;
+	@Getter
+	private final InputStream body;
 
 
 	// PATH
-	@API public String getPathSegment(int segmentIndex) throws BadRequestHttpException
+	@API
+	public String getPathSegment(int segmentIndex) throws BadRequestHttpException
 	{
 		String[] pathSplit = path.split(StringUtil.escapeStringForRegex("/"));
 
@@ -41,7 +48,8 @@ public class HttpRequest implements AutoCloseable
 		return pathSplit[splitIndex];
 	}
 
-	@API public int getPathSegmentAsInt(int segementIndex) throws BadRequestHttpException
+	@API
+	public int getPathSegmentAsInt(int segementIndex) throws BadRequestHttpException
 	{
 		String pathSegmentString = getPathSegment(segementIndex);
 
@@ -59,25 +67,52 @@ public class HttpRequest implements AutoCloseable
 
 
 	// HEADERS
-	@API public List<String> getHeaderValues(String key) throws BadRequestHttpException
+	@API
+	public List<String> getHeaderValuesOrError(String key) throws BadRequestHttpException
 	{
-		if(!headers.containsKey(key))
+		if(!headers.containsKey(key.toLowerCase()))
 			throw new BadRequestHttpException(PHR.r("request is missing header with key '{}'", key));
 
-		return headers.get(key);
+		return headers.get(key.toLowerCase());
 	}
 
-	@API public String getHeaderValue(String key) throws BadRequestHttpException
+	@API
+	public String getHeaderValueOrError(String key) throws BadRequestHttpException
 	{
-		List<String> headerValues = getHeaderValues(key);
+		List<String> headerValues = getHeaderValuesOrError(key);
 		if(headerValues.size() > 1)
 			throw new BadRequestHttpException(PHR.r("request contained multiple values for header '{}', must be one", key));
 
 		return Iterables.getOnlyElement(headerValues);
 	}
 
+	@API
+	public Optional<List<String>> getHeaderValues(String key)
+	{
+		if(!headers.containsKey(key.toLowerCase()))
+			return Optional.empty();
+
+		return Optional.of(headers.get(key.toLowerCase()));
+	}
+
+	@API
+	public Optional<String> getHeaderValue(String key) throws BadRequestHttpException
+	{
+		Optional<List<String>> headerValuesOptional = getHeaderValues(key);
+		if(!headerValuesOptional.isPresent())
+			return Optional.empty();
+
+		List<String> headerValues = headerValuesOptional.get();
+		if(headerValues.size() > 1)
+			throw new BadRequestHttpException(PHR.r("request contained multiple values for header '{}', must be one", key));
+
+		return Optional.of(headerValues.get(0));
+	}
+
+
 	// PARAMETERS
-	@API public List<String> getParameterValues(String key) throws BadRequestHttpException
+	@API
+	public List<String> getParameterValuesOrError(String key) throws BadRequestHttpException
 	{
 		if(!queryParameters.containsKey(key))
 			throw new BadRequestHttpException(PHR.r("request is missing query parameter with key '{}'", key));
@@ -85,22 +120,49 @@ public class HttpRequest implements AutoCloseable
 		return queryParameters.get(key);
 	}
 
-	@API public String getParameterValue(String key) throws BadRequestHttpException
+	@API
+	public String getParameterValueOrError(String key) throws BadRequestHttpException
 	{
-		List<String> parameterValues = getParameterValues(key);
+		List<String> parameterValues = getParameterValuesOrError(key);
 		if(parameterValues.size() > 1)
 			throw new BadRequestHttpException(PHR.r("request contained multiple values for parameter '{}', must be one", key));
 
 		return Iterables.getOnlyElement(parameterValues);
 	}
 
+	@API
+	public Optional<List<String>> getParameterValues(String key)
+	{
+		if(!queryParameters.containsKey(key))
+			return Optional.empty();
+
+		return Optional.of(queryParameters.get(key));
+	}
+
+	@API
+	public Optional<String> getParameterValue(String key) throws BadRequestHttpException
+	{
+		Optional<List<String>> parameterValuesOptional = getParameterValues(key);
+		if(!parameterValuesOptional.isPresent())
+			return Optional.empty();
+
+		List<String> parameterValues = parameterValuesOptional.get();
+		if(parameterValues.size() > 1)
+			throw new BadRequestHttpException(PHR.r("request contained multiple values for parameter '{}', must be one", key));
+
+		return Optional.of(parameterValues.get(0));
+	}
+
+
 	// BODY
-	@API public String getBodyAsString() throws IOException
+	@API
+	public String getBodyAsString() throws IOException
 	{
 		return IOUtils.toString(body, StandardCharsets.UTF_8);
 	}
 
-	@Override public void close() throws IOException
+	@Override
+	public void close() throws IOException
 	{
 		body.close();
 	}
