@@ -3,6 +3,7 @@ package de.domisum.httpbutler;
 import de.domisum.httpbutler.exceptions.HttpException;
 import de.domisum.httpbutler.exceptions.InternalServerErrorHttpException;
 import de.domisum.httpbutler.exceptions.MethodNotAllowedHttpException;
+import de.domisum.httpbutler.postprocessor.HttpResponsePostprocessor;
 import de.domisum.httpbutler.preprocessor.HttpRequestPreprocessor;
 import de.domisum.httpbutler.request.HttpMethod;
 import de.domisum.httpbutler.request.HttpRequest;
@@ -47,6 +48,7 @@ public class HttpButlerServer
 	private final RequestHandlingStrategy fallbackHandlingStrategy = null; // TODO
 
 	private final List<HttpRequestPreprocessor> requestPreprocessors = new ArrayList<>();
+	private final List<HttpResponsePostprocessor> responsePostProcessors = new ArrayList<>();
 
 	// SERVER
 	private Undertow server;
@@ -118,6 +120,12 @@ public class HttpButlerServer
 		requestPreprocessors.add(requestPreprocessor);
 	}
 
+	@API
+	public synchronized void registerResponsePostprocessor(HttpResponsePostprocessor httpResponsePostprocessor)
+	{
+		responsePostProcessors.add(httpResponsePostprocessor);
+	}
+
 
 	// REQUEST
 	private HttpRequest buildHttpRequest(HttpServerExchange exchange)
@@ -158,6 +166,7 @@ public class HttpButlerServer
 		try
 		{
 			handleOrThrowHttpException(request, responseSender);
+			postProcessResponse(request, responseSender);
 		}
 		catch(HttpException e)
 		{
@@ -203,6 +212,12 @@ public class HttpButlerServer
 		}
 
 		return handlingStrategy.get().getHandler();
+	}
+
+	private void postProcessResponse(HttpRequest request, HttpResponseSender responseSender) throws HttpException
+	{
+		for(HttpResponsePostprocessor rpp : responsePostProcessors)
+			rpp.postprocess(request, responseSender);
 	}
 
 
