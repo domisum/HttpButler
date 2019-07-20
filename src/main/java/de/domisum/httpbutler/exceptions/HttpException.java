@@ -16,6 +16,11 @@ public abstract class HttpException extends Exception
 		super(message);
 	}
 
+	protected HttpException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+
 
 	public abstract void sendError(HttpResponseSender responseSender);
 
@@ -24,7 +29,10 @@ public abstract class HttpException extends Exception
 	protected void sendError(HttpResponseSender responseSender, int errorCode, String errorName)
 	{
 		responseSender.setStatusCode(errorCode);
-		responseSender.sendPlaintext(errorName+(getMessage() == null ? "" : ": "+getMessage()));
+
+		String causeString = (getCause() == null) ? "" : (" Exception: \n"+getCause().toString());
+		String response = errorName+(getMessage() == null ? "" : ": "+getMessage())+causeString;
+		responseSender.sendPlaintext(response);
 	}
 
 }

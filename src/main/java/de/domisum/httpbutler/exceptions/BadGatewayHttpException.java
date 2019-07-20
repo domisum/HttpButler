@@ -21,6 +21,12 @@ public class BadGatewayHttpException extends HttpException
 		super(message);
 	}
 
+	@API
+	public BadGatewayHttpException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+
 
 	// ERROR
 	@Override
