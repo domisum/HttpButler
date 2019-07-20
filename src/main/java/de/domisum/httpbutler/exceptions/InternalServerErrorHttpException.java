@@ -9,24 +9,28 @@ public class InternalServerErrorHttpException extends HttpException
 {
 
 	// INIT
-	@API public InternalServerErrorHttpException()
+	@API
+	public InternalServerErrorHttpException()
 	{
 
 	}
 
-	@API public InternalServerErrorHttpException(String message)
+	@API
+	public InternalServerErrorHttpException(String message)
 	{
 		super(message);
 	}
 
-	@API public InternalServerErrorHttpException(Exception e)
+	@API
+	public InternalServerErrorHttpException(String message, Throwable cause)
 	{
-		this(e.getClass().getName()+": "+e.getMessage());
+		super(message, cause);
 	}
 
 
 	// ERROR
-	@Override public void sendError(HttpResponseSender responseSender)
+	@Override
+	public void sendError(HttpResponseSender responseSender)
 	{
 		sendError(responseSender, StatusCodes.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR_STRING);
 	}

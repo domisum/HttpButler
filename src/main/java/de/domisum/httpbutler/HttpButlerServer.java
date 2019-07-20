@@ -1,6 +1,7 @@
 package de.domisum.httpbutler;
 
 import de.domisum.httpbutler.exceptions.HttpException;
+import de.domisum.httpbutler.exceptions.InternalServerErrorHttpException;
 import de.domisum.httpbutler.exceptions.MethodNotAllowedHttpException;
 import de.domisum.httpbutler.preprocessor.HttpRequestPreprocessor;
 import de.domisum.httpbutler.request.HttpMethod;
@@ -52,14 +53,16 @@ public class HttpButlerServer
 
 
 	// INIT
-	@API public HttpButlerServer(String host, int port)
+	@API
+	public HttpButlerServer(String host, int port)
 	{
 		this.host = host;
 		this.port = port;
 	}
 
 
-	@API public synchronized void start()
+	@API
+	public synchronized void start()
 	{
 		if(server != null)
 			return;
@@ -72,7 +75,8 @@ public class HttpButlerServer
 		server.start();
 	}
 
-	@API public synchronized void stop()
+	@API
+	public synchronized void stop()
 	{
 		if(server == null)
 			return;
@@ -83,12 +87,14 @@ public class HttpButlerServer
 
 
 	// HANDLERS REGISTRATION
-	@API public synchronized void registerStaticPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
+	@API
+	public synchronized void registerStaticPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
 	{
 		registerRequestHandlingStrategy(new StaticPathRequestHandlingStrategy(method, path, handler));
 	}
 
-	@API public synchronized void registerArgsInPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
+	@API
+	public synchronized void registerArgsInPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
 	{
 		registerRequestHandlingStrategy(new ArgsInPathRequestHandlingStrategy(method, path, handler));
 	}
@@ -100,12 +106,14 @@ public class HttpButlerServer
 	}
 
 
-	@API public synchronized void registerRequestHandlingStrategy(RequestHandlingStrategy requestHandlingStrategy)
+	@API
+	public synchronized void registerRequestHandlingStrategy(RequestHandlingStrategy requestHandlingStrategy)
 	{
 		requestHandlingStrategies.add(requestHandlingStrategy);
 	}
 
-	@API public synchronized void registerRequestPreprocessor(HttpRequestPreprocessor requestPreprocessor)
+	@API
+	public synchronized void registerRequestPreprocessor(HttpRequestPreprocessor requestPreprocessor)
 	{
 		requestPreprocessors.add(requestPreprocessor);
 	}
@@ -155,6 +163,10 @@ public class HttpButlerServer
 		{
 			e.sendError(responseSender);
 		}
+		catch(RuntimeException e)
+		{
+			new InternalServerErrorHttpException("an error occured while processing the request", e).sendError(responseSender);
+		}
 	}
 
 	private void handleOrThrowHttpException(HttpRequest rawRequest, HttpResponseSender responseSender) throws HttpException
@@ -198,7 +210,8 @@ public class HttpButlerServer
 	private class HttpButlerServerHttpHandler implements HttpHandler
 	{
 
-		@Override public void handleRequest(HttpServerExchange exchange) throws IOException
+		@Override
+		public void handleRequest(HttpServerExchange exchange) throws IOException
 		{
 			if(exchange.isInIoThread())
 			{
