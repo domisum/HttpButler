@@ -38,7 +38,7 @@ public abstract class HttpException extends Exception
 	private String convertThrowableToString(Throwable throwable)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(throwable.toString());
+		stringBuilder.append(throwable.toString()).append("\n");
 
 		for(StackTraceElement stackTraceElement : throwable.getStackTrace())
 			stringBuilder.append("    ").append(stackTraceElement.toString()).append("\n");
