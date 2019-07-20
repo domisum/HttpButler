@@ -30,9 +30,20 @@ public abstract class HttpException extends Exception
 	{
 		responseSender.setStatusCode(errorCode);
 
-		String causeString = (getCause() == null) ? "" : (" Exception: \n"+getCause().toString());
+		String causeString = (getCause() == null) ? "" : (" Exception: \n"+convertThrowableToString(getCause()));
 		String response = errorName+(getMessage() == null ? "" : ": "+getMessage())+causeString;
 		responseSender.sendPlaintext(response);
+	}
+
+	private String convertThrowableToString(Throwable throwable)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(throwable.toString());
+
+		for(StackTraceElement stackTraceElement : throwable.getStackTrace())
+			stringBuilder.append("    ").append(stackTraceElement.toString()).append("\n");
+
+		return stringBuilder.toString();
 	}
 
 }
