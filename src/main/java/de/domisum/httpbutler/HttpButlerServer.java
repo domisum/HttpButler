@@ -165,6 +165,7 @@ public class HttpButlerServer
 		}
 		catch(RuntimeException e)
 		{
+			logger.error("an error occured while processing the request", e);
 			new InternalServerErrorHttpException("an error occured while processing the request", e).sendError(responseSender);
 		}
 	}
