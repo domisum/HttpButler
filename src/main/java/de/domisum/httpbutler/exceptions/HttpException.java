@@ -1,6 +1,7 @@
 package de.domisum.httpbutler.exceptions;
 
 import de.domisum.httpbutler.HttpResponseSender;
+import de.domisum.lib.auxilium.util.java.ExceptionUtil;
 
 public abstract class HttpException extends Exception
 {
@@ -30,23 +31,9 @@ public abstract class HttpException extends Exception
 	{
 		responseSender.setStatusCode(errorCode);
 
-		String causeString = (getCause() == null) ? "" : (" Exception: \n"+convertThrowableToString(getCause()));
+		String causeString = (getCause() == null) ? "" : (" Exception: \n"+ExceptionUtil.convertThrowableToString(getCause()));
 		String response = errorName+(getMessage() == null ? "" : ": "+getMessage())+causeString;
 		responseSender.sendPlaintext(response);
-	}
-
-	private String convertThrowableToString(Throwable throwable)
-	{
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(throwable.toString()).append("\n");
-
-		for(StackTraceElement stackTraceElement : throwable.getStackTrace())
-			stringBuilder.append("    ").append(stackTraceElement.toString()).append("\n");
-
-		if(throwable.getCause() != null)
-			stringBuilder.append("Caused by: ").append(convertThrowableToString(throwable.getCause()));
-
-		return stringBuilder.toString();
 	}
 
 }
