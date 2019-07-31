@@ -43,6 +43,9 @@ public abstract class HttpException extends Exception
 		for(StackTraceElement stackTraceElement : throwable.getStackTrace())
 			stringBuilder.append("    ").append(stackTraceElement.toString()).append("\n");
 
+		if(throwable.getCause() != null)
+			stringBuilder.append("Caused by: ").append(convertThrowableToString(throwable.getCause()));
+
 		return stringBuilder.toString();
 	}
 
