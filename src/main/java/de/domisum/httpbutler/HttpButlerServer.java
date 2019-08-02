@@ -17,6 +17,7 @@ import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.BlockingHandler;
 import io.undertow.util.HeaderValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class HttpButlerServer
 		logger.info("Starting {}...", getClass().getSimpleName());
 
 		Builder serverBuilder = Undertow.builder();
-		serverBuilder.addHttpListener(port, host, new HttpButlerServerHttpHandler());
+		serverBuilder.addHttpListener(port, host, new BlockingHandler(new HttpButlerServerHttpHandler()));
 		server = serverBuilder.build();
 
 		server.start();
@@ -153,7 +154,7 @@ public class HttpButlerServer
 		return new HttpRequest(method, requestPath, headers, queryParams, body);
 	}
 
-	private synchronized void handleRequest(HttpRequest request, HttpResponseSender responseSender)
+	private void handleRequest(HttpRequest request, HttpResponseSender responseSender)
 	{
 		try
 		{
@@ -218,12 +219,6 @@ public class HttpButlerServer
 		@Override
 		public void handleRequest(HttpServerExchange exchange) throws IOException
 		{
-			if(exchange.isInIoThread())
-			{
-				exchange.dispatch(this);
-				return;
-			}
-
 			try(HttpRequest request = buildHttpRequest(exchange))
 			{
 				HttpResponseSender responseSender = new HttpResponseSender(exchange);
