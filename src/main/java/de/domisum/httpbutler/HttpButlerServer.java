@@ -67,7 +67,7 @@ public class HttpButlerServer
 	{
 		if(server != null)
 			return;
-		logger.info("Starting {}...", getClass().getSimpleName());
+		logger.info("Starting {} on {}:{}...", getClass().getSimpleName(), host, port);
 
 		Builder serverBuilder = Undertow.builder();
 		serverBuilder.addHttpListener(port, host, new BlockingHandler(new HttpButlerServerHttpHandler()));
