@@ -200,13 +200,10 @@ public class HttpButlerServer
 		).selectFirstApplicable(request);
 
 		if(!handlingStrategy.isPresent())
-		{
-			logger.warn("Received request {}, no request handler speicified for that request method and type", request);
 			throw new MethodNotAllowedHttpException(PHR.r("Server unable to process method {} on path '{}'",
 					request.getMethod(),
 					request.getPath()
 			));
-		}
 
 		return handlingStrategy.get().getHandler();
 	}
