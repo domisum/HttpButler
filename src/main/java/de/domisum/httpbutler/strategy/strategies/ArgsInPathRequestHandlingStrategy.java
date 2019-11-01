@@ -18,7 +18,7 @@ public class ArgsInPathRequestHandlingStrategy implements RequestHandlingStrateg
 
 	// CONSTANTS
 	private static final String PLACEHOLDER = "#";
-	private static final String PARAMETER_REGEX = "[0-9a-zA-Z-_%]+";
+	private static final String PARAMETER_REGEX = "[0-9a-zA-Z-_%\\.]+";
 
 	// ATTRIBUTES
 	private final HttpMethod httpMethod;
@@ -28,7 +28,8 @@ public class ArgsInPathRequestHandlingStrategy implements RequestHandlingStrateg
 
 
 	// HANDLING STRATEGY
-	@Override public boolean doesApplyTo(HttpRequest request)
+	@Override
+	public boolean doesApplyTo(HttpRequest request)
 	{
 		if(request.getMethod() != httpMethod)
 			return false;
@@ -44,7 +45,8 @@ public class ArgsInPathRequestHandlingStrategy implements RequestHandlingStrateg
 		return true;
 	}
 
-	@Override public HttpRequestHandler getHandler()
+	@Override
+	public HttpRequestHandler getHandler()
 	{
 		return requestHandler;
 	}
