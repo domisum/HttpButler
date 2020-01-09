@@ -18,7 +18,8 @@ public class StartingWithRequestHandlingStrategy implements RequestHandlingStrat
 
 
 	// HANDLING STRATEGY
-	@Override public boolean doesApplyTo(HttpRequest request)
+	@Override
+	public boolean doesApplyTo(HttpRequest request)
 	{
 		if(request.getMethod() != httpMethod)
 			return false;
@@ -26,7 +27,8 @@ public class StartingWithRequestHandlingStrategy implements RequestHandlingStrat
 		return request.getPath().toLowerCase().startsWith(httpPath.toLowerCase());
 	}
 
-	@Override public HttpRequestHandler getHandler()
+	@Override
+	public HttpRequestHandler getHandler()
 	{
 		return requestHandler;
 	}

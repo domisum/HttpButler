@@ -11,14 +11,16 @@ public class ForbiddenHttpException extends HttpException
 {
 
 	// INIT
-	@API public ForbiddenHttpException(String message)
+	@API
+	public ForbiddenHttpException(String message)
 	{
 		super(message);
 	}
 
 
 	// ERROR
-	@Override public void sendError(HttpResponseSender responseSender)
+	@Override
+	public void sendError(HttpResponseSender responseSender)
 	{
 		sendError(responseSender, StatusCodes.FORBIDDEN, StatusCodes.FORBIDDEN_STRING);
 	}

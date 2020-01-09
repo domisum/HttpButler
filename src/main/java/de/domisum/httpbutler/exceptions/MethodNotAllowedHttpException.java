@@ -9,19 +9,22 @@ public class MethodNotAllowedHttpException extends HttpException
 {
 
 	// INIT
-	@API public MethodNotAllowedHttpException()
+	@API
+	public MethodNotAllowedHttpException()
 	{
 
 	}
 
-	@API public MethodNotAllowedHttpException(String message)
+	@API
+	public MethodNotAllowedHttpException(String message)
 	{
 		super(message);
 	}
 
 
 	// ERROR
-	@Override public void sendError(HttpResponseSender responseSender)
+	@Override
+	public void sendError(HttpResponseSender responseSender)
 	{
 		sendError(responseSender, StatusCodes.METHOD_NOT_ALLOWED, StatusCodes.METHOD_NOT_ALLOWED_STRING);
 	}

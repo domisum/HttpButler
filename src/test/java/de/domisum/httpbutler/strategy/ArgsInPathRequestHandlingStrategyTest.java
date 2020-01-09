@@ -13,7 +13,8 @@ import java.util.HashMap;
 public class ArgsInPathRequestHandlingStrategyTest
 {
 
-	@Test void testSimplePatternMatching()
+	@Test
+	void testSimplePatternMatching()
 	{
 		Strategy<HttpRequest> strategy = new ArgsInPathRequestHandlingStrategy(HttpMethod.GET, "/query/#", null);
 
@@ -28,7 +29,8 @@ public class ArgsInPathRequestHandlingStrategyTest
 		assertNotApplyTo(strategy, requestFromMethodAndPath(HttpMethod.GET, "/query/"));
 	}
 
-	@Test void testPatternMatching()
+	@Test
+	void testPatternMatching()
 	{
 		Strategy<HttpRequest> strategy = new ArgsInPathRequestHandlingStrategy(HttpMethod.PUT,
 				"/observer-mode/rest/consumer/getGameMetaData/#/#/#/token",

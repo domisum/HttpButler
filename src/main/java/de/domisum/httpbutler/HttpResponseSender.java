@@ -16,25 +16,29 @@ public class HttpResponseSender
 
 
 	// SENDING
-	@API public void sendPlaintext(String text)
+	@API
+	public void sendPlaintext(String text)
 	{
 		undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
 		undertowExchange.getResponseSender().send(text);
 	}
 
-	@API public void sendJson(String json)
+	@API
+	public void sendJson(String json)
 	{
 		undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
 		undertowExchange.getResponseSender().send(json);
 	}
 
-	@API public void sendRaw(byte[] data)
+	@API
+	public void sendRaw(byte[] data)
 	{
 		undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/octet-stream");
 		undertowExchange.getResponseSender().send(ByteBuffer.wrap(data));
 	}
 
-	@API public void sendRawWithType(byte[] data, String contentType)
+	@API
+	public void sendRawWithType(byte[] data, String contentType)
 	{
 		undertowExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType);
 		undertowExchange.getResponseSender().send(ByteBuffer.wrap(data));
@@ -42,7 +46,8 @@ public class HttpResponseSender
 
 
 	// ERRORS
-	@API public void setStatusCode(int statusCode)
+	@API
+	public void setStatusCode(int statusCode)
 	{
 		undertowExchange.setStatusCode(statusCode);
 	}

@@ -7,7 +7,8 @@ import de.domisum.lib.auxilium.contracts.strategy.Strategy;
 public interface RequestHandlingStrategy extends Strategy<HttpRequest>
 {
 
-	@Override boolean doesApplyTo(HttpRequest object);
+	@Override
+	boolean doesApplyTo(HttpRequest object);
 
 	HttpRequestHandler getHandler();
 

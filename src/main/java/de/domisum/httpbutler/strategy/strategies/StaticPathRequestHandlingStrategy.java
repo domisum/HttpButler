@@ -18,7 +18,8 @@ public class StaticPathRequestHandlingStrategy implements RequestHandlingStrateg
 
 
 	// HANDLING STRATEGY
-	@Override public boolean doesApplyTo(HttpRequest request)
+	@Override
+	public boolean doesApplyTo(HttpRequest request)
 	{
 		if(request.getMethod() != httpMethod)
 			return false;
@@ -29,7 +30,8 @@ public class StaticPathRequestHandlingStrategy implements RequestHandlingStrateg
 		return true;
 	}
 
-	@Override public HttpRequestHandler getHandler()
+	@Override
+	public HttpRequestHandler getHandler()
 	{
 		return requestHandler;
 	}
