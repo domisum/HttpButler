@@ -138,7 +138,7 @@ public class HttpButlerServer
 		for(HeaderValues h : exchange.getRequestHeaders())
 		{
 			String headerName = h.getHeaderName().toString().toLowerCase();
-			List<String> values = Collections.unmodifiableList(new ArrayList<>(h));
+			List<String> values = List.copyOf(h);
 
 			headers.put(headerName, values);
 		}
@@ -147,9 +147,8 @@ public class HttpButlerServer
 		// params
 		Map<String, List<String>> queryParams = new HashMap<>();
 		for(Entry<String, Deque<String>> entry : exchange.getQueryParameters().entrySet())
-			queryParams.put(entry.getKey(), Collections.unmodifiableList(new ArrayList<>(entry.getValue())));
+			queryParams.put(entry.getKey(), List.copyOf(entry.getValue()));
 		queryParams = Collections.unmodifiableMap(queryParams);
-
 
 		return new HttpRequest(method, requestPath, headers, queryParams, body);
 	}
@@ -199,7 +198,7 @@ public class HttpButlerServer
 				fallbackHandlingStrategy
 		).selectFirstApplicable(request);
 
-		if(!handlingStrategy.isPresent())
+		if(handlingStrategy.isEmpty())
 			throw new MethodNotAllowedHttpException(PHR.r("Server unable to process method {} on path '{}'",
 					request.getMethod(),
 					request.getPath()
