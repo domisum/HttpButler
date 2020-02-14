@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @API
-public abstract class HttpRequestHandler
+public abstract class HttpRequestHandler // TODO convert to interface
 {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
