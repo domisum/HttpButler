@@ -44,9 +44,11 @@ public class HttpButlerServer
 	private final String host;
 	private final int port;
 
+	private int numberOfIoThreads = Runtime.getRuntime().availableProcessors();
+	private int numberOfWorkerThreads = Runtime.getRuntime().availableProcessors();
+
 	private final List<RequestHandlingStrategy> requestHandlingStrategies = new ArrayList<>();
 	private final RequestHandlingStrategy fallbackHandlingStrategy = null; // TODO
-
 	private final List<HttpRequestPreprocessor> requestPreprocessors = new ArrayList<>();
 
 	// SERVER
@@ -62,6 +64,7 @@ public class HttpButlerServer
 	}
 
 
+	// CONTROL
 	@API
 	public synchronized void start()
 	{
@@ -71,6 +74,8 @@ public class HttpButlerServer
 
 		Builder serverBuilder = Undertow.builder();
 		serverBuilder.addHttpListener(port, host, new BlockingHandler(new HttpButlerServerHttpHandler()));
+		serverBuilder.setIoThreads(numberOfIoThreads);
+		serverBuilder.setWorkerThreads(numberOfWorkerThreads);
 		server = serverBuilder.build();
 
 		server.start();
@@ -81,9 +86,32 @@ public class HttpButlerServer
 	{
 		if(server == null)
 			return;
-		logger.info("Stopping {}...", getClass().getSimpleName());
 
+		logger.info("Stopping {}...", getClass().getSimpleName());
 		server.stop();
+		server = null;
+	}
+
+
+	// SETTINGS
+	private void validateCanChangeSettings()
+	{
+		if(server != null)
+			throw new IllegalStateException("can't change settings while server is running");
+	}
+
+	@API
+	public synchronized void setNumberOfIoThreads(int numberOfIoThreads)
+	{
+		validateCanChangeSettings();
+		this.numberOfIoThreads = numberOfIoThreads;
+	}
+
+	@API
+	public synchronized void setNumberOfWorkerThreads(int numberOfWorkerThreads)
+	{
+		validateCanChangeSettings();
+		this.numberOfWorkerThreads = numberOfWorkerThreads;
 	}
 
 
