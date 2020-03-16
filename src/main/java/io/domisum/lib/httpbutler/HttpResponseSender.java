@@ -1,6 +1,6 @@
-package de.domisum.httpbutler;
+package io.domisum.lib.httpbutler;
 
-import de.domisum.lib.auxilium.util.java.annotations.API;
+import io.domisum.lib.auxiliumlib.util.java.annotations.API;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;

@@ -1,9 +1,9 @@
-package de.domisum.httpbutler.strategy;
+package io.domisum.lib.httpbutler.strategy;
 
-import de.domisum.httpbutler.request.HttpMethod;
-import de.domisum.httpbutler.request.HttpRequest;
-import de.domisum.httpbutler.strategy.strategies.ArgsInPathRequestHandlingStrategy;
-import de.domisum.lib.auxilium.contracts.strategy.Strategy;
+import io.domisum.lib.httpbutler.request.HttpMethod;
+import io.domisum.lib.httpbutler.request.HttpRequest;
+import io.domisum.lib.httpbutler.strategy.strategies.ArgsInPathRequestHandlingStrategy;
+import io.domisum.lib.auxiliumlib.contracts.strategy.Strategy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

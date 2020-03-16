@@ -1,10 +1,10 @@
-package de.domisum.httpbutler.strategy.strategies;
+package io.domisum.lib.httpbutler.strategy.strategies;
 
-import de.domisum.httpbutler.HttpRequestHandler;
-import de.domisum.httpbutler.request.HttpMethod;
-import de.domisum.httpbutler.request.HttpRequest;
-import de.domisum.httpbutler.strategy.RequestHandlingStrategy;
-import de.domisum.lib.auxilium.util.StringUtil;
+import io.domisum.lib.httpbutler.HttpRequestHandler;
+import io.domisum.lib.httpbutler.request.HttpMethod;
+import io.domisum.lib.httpbutler.request.HttpRequest;
+import io.domisum.lib.httpbutler.strategy.RequestHandlingStrategy;
+import io.domisum.lib.auxiliumlib.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

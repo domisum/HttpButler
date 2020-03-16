@@ -1,7 +1,7 @@
-package de.domisum.httpbutler.exceptions;
+package io.domisum.lib.httpbutler.exceptions;
 
-import de.domisum.httpbutler.HttpResponseSender;
-import de.domisum.lib.auxilium.util.java.ExceptionUtil;
+import io.domisum.lib.httpbutler.HttpResponseSender;
+import io.domisum.lib.auxiliumlib.util.java.ExceptionUtil;
 
 public abstract class HttpException extends Exception
 {
