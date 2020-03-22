@@ -1,10 +1,10 @@
 package io.domisum.lib.httpbutler.request;
 
 import com.google.common.collect.Iterables;
-import io.domisum.lib.httpbutler.exceptions.BadRequestHttpException;
 import io.domisum.lib.auxiliumlib.util.PHR;
 import io.domisum.lib.auxiliumlib.util.StringUtil;
 import io.domisum.lib.auxiliumlib.util.java.annotations.API;
+import io.domisum.lib.httpbutler.exceptions.BadRequestHttpException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -68,7 +68,7 @@ public class HttpRequest implements AutoCloseable
 
 	// HEADERS
 	@API
-	public List<String> getHeaderValuesOrError(String key) throws BadRequestHttpException
+	public List<String> getHeaderValuesOrException(String key) throws BadRequestHttpException
 	{
 		if(!headers.containsKey(key.toLowerCase()))
 			throw new BadRequestHttpException(PHR.r("request is missing header with key '{}'", key));
@@ -77,9 +77,9 @@ public class HttpRequest implements AutoCloseable
 	}
 
 	@API
-	public String getHeaderValueOrError(String key) throws BadRequestHttpException
+	public String getHeaderValueOrException(String key) throws BadRequestHttpException
 	{
-		List<String> headerValues = getHeaderValuesOrError(key);
+		var headerValues = getHeaderValuesOrException(key);
 		if(headerValues.size() > 1)
 			throw new BadRequestHttpException(PHR.r("request contained multiple values for header '{}', must be one", key));
 
@@ -98,11 +98,11 @@ public class HttpRequest implements AutoCloseable
 	@API
 	public Optional<String> getHeaderValue(String key) throws BadRequestHttpException
 	{
-		Optional<List<String>> headerValuesOptional = getHeaderValues(key);
-		if(!headerValuesOptional.isPresent())
+		var headerValuesOptional = getHeaderValues(key);
+		if(headerValuesOptional.isEmpty())
 			return Optional.empty();
 
-		List<String> headerValues = headerValuesOptional.get();
+		var headerValues = headerValuesOptional.get();
 		if(headerValues.size() > 1)
 			throw new BadRequestHttpException(PHR.r("request contained multiple values for header '{}', must be one", key));
 
@@ -112,7 +112,7 @@ public class HttpRequest implements AutoCloseable
 
 	// PARAMETERS
 	@API
-	public List<String> getParameterValuesOrError(String key) throws BadRequestHttpException
+	public List<String> getParameterValuesOrException(String key) throws BadRequestHttpException
 	{
 		if(!queryParameters.containsKey(key))
 			throw new BadRequestHttpException(PHR.r("request is missing query parameter with key '{}'", key));
@@ -121,9 +121,9 @@ public class HttpRequest implements AutoCloseable
 	}
 
 	@API
-	public String getParameterValueOrError(String key) throws BadRequestHttpException
+	public String getParameterValueOrException(String key) throws BadRequestHttpException
 	{
-		List<String> parameterValues = getParameterValuesOrError(key);
+		var parameterValues = getParameterValuesOrException(key);
 		if(parameterValues.size() > 1)
 			throw new BadRequestHttpException(PHR.r("request contained multiple values for parameter '{}', must be one", key));
 
@@ -142,11 +142,11 @@ public class HttpRequest implements AutoCloseable
 	@API
 	public Optional<String> getParameterValue(String key) throws BadRequestHttpException
 	{
-		Optional<List<String>> parameterValuesOptional = getParameterValues(key);
-		if(!parameterValuesOptional.isPresent())
+		var parameterValuesOptional = getParameterValues(key);
+		if(parameterValuesOptional.isEmpty())
 			return Optional.empty();
 
-		List<String> parameterValues = parameterValuesOptional.get();
+		var parameterValues = parameterValuesOptional.get();
 		if(parameterValues.size() > 1)
 			throw new BadRequestHttpException(PHR.r("request contained multiple values for parameter '{}', must be one", key));
 
