@@ -11,8 +11,8 @@ import io.domisum.lib.httpbutler.strategy.strategies.ArgsInPathRequestHandlingSt
 import io.domisum.lib.httpbutler.strategy.strategies.StartingWithRequestHandlingStrategy;
 import io.domisum.lib.httpbutler.strategy.strategies.StaticPathRequestHandlingStrategy;
 import io.domisum.lib.auxiliumlib.contracts.strategy.StrategySelector;
-import io.domisum.lib.auxiliumlib.util.PHR;
-import io.domisum.lib.auxiliumlib.util.java.annotations.API;
+import io.domisum.lib.auxiliumlib.PHR;
+import io.domisum.lib.auxiliumlib.annotations.API;
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
 import io.undertow.server.HttpHandler;

@@ -1,7 +1,7 @@
 package io.domisum.lib.httpbutler.exceptions;
 
 import io.domisum.lib.httpbutler.HttpResponseSender;
-import io.domisum.lib.auxiliumlib.util.java.annotations.API;
+import io.domisum.lib.auxiliumlib.annotations.API;
 import io.undertow.util.StatusCodes;
 import lombok.NoArgsConstructor;
 

@@ -1,9 +1,9 @@
 package io.domisum.lib.httpbutler.request;
 
 import com.google.common.collect.Iterables;
-import io.domisum.lib.auxiliumlib.util.PHR;
+import io.domisum.lib.auxiliumlib.PHR;
 import io.domisum.lib.auxiliumlib.util.StringUtil;
-import io.domisum.lib.auxiliumlib.util.java.annotations.API;
+import io.domisum.lib.auxiliumlib.annotations.API;
 import io.domisum.lib.httpbutler.exceptions.BadRequestHttpException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

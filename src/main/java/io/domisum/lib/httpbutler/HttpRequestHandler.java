@@ -2,7 +2,7 @@ package io.domisum.lib.httpbutler;
 
 import io.domisum.lib.httpbutler.exceptions.HttpException;
 import io.domisum.lib.httpbutler.request.HttpRequest;
-import io.domisum.lib.auxiliumlib.util.java.annotations.API;
+import io.domisum.lib.auxiliumlib.annotations.API;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
