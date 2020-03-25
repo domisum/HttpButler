@@ -1,38 +1,32 @@
 package io.domisum.lib.httpbutler.exceptions;
 
-import io.domisum.lib.httpbutler.HttpResponseSender;
 import io.domisum.lib.auxiliumlib.annotations.API;
 import io.undertow.util.StatusCodes;
 
 @API
-public class BadRequestHttpException extends HttpException
+public class BadRequestHttpException
+		extends HttpException
 {
-
-	// INIT
-	@API
-	public BadRequestHttpException()
+	
+	// CONSTANTS
+	@Override
+	public int ERROR_CODE_INT()
 	{
-
+		return StatusCodes.BAD_REQUEST;
 	}
-
+	
+	@Override
+	public String ERROR_CODE_STRING()
+	{
+		return StatusCodes.BAD_REQUEST_STRING;
+	}
+	
+	
+	// INIT
 	@API
 	public BadRequestHttpException(String message)
 	{
 		super(message);
 	}
-
-	@API
-	public BadRequestHttpException(String message, Throwable t)
-	{
-		this(message+" "+t);
-	}
-
-
-	// ERROR
-	@Override
-	public void sendError(HttpResponseSender responseSender)
-	{
-		sendError(responseSender, StatusCodes.BAD_REQUEST, StatusCodes.BAD_REQUEST_STRING);
-	}
-
+	
 }

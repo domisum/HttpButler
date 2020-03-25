@@ -7,19 +7,18 @@ import io.domisum.lib.auxiliumlib.util.StringUtil;
 import io.domisum.lib.httpbutler.exceptions.BadRequestHttpException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-@ToString
 public class HttpRequest
 		implements AutoCloseable
 {
@@ -28,12 +27,42 @@ public class HttpRequest
 	private final HttpMethod method;
 	@Getter
 	private final String path;
-	@Getter
-	private final Map<String,List<String>> headers;
-	@Getter
-	private final Map<String,List<String>> queryParameters;
+	
+	private final Map<String,List<String>> queryParameters; // keys lowercase
+	private final Map<String,List<String>> headers; // keys lowercase
+	
 	@Getter
 	private final InputStream body;
+	
+	
+	// OBJECT
+	@Override
+	public String toString()
+	{
+		var lines = new ArrayList<>();
+		
+		lines.add(method+" "+path);
+		
+		lines.add("Query parameters:");
+		if(queryParameters.isEmpty())
+			lines.add(" (none)");
+		else
+			for(var queryParameter : queryParameters.entrySet())
+				for(String value : queryParameter.getValue())
+					lines.add(" - "+queryParameter.getKey()+"="+value);
+		
+		lines.add("Headers:");
+		if(headers.isEmpty())
+			lines.add(" (none)");
+		else
+			for(var header : headers.entrySet())
+				for(String value : header.getValue())
+					lines.add(" - "+header.getKey()+": "+value);
+		
+		lines.add("Body: (omitted)");
+		
+		return StringUtil.listToString(lines, "\n");
+	}
 	
 	
 	// PATH
@@ -66,6 +95,50 @@ public class HttpRequest
 			throw new BadRequestHttpException(PHR.r("path segment on index {} supposed to be integer, was {}",
 					pathSegmentString
 			));
+		}
+	}
+	
+	
+	// PARAMETERS
+	@API
+	public List<String> getQueryParameterValues(String key)
+	{
+		key = key.toLowerCase();
+		
+		var values = queryParameters.get(key);
+		if(values == null)
+			return new ArrayList<>();
+		return values;
+	}
+	
+	@API
+	public String getQueryParameterValue(String key)
+			throws BadRequestHttpException
+	{
+		key = key.toLowerCase();
+		var parameterValues = getQueryParameterValues(key);
+		
+		if(parameterValues.size() > 1)
+			throw new BadRequestHttpException(PHR.r("request contained multiple values for paramenter '{}' but only one is expected", key));
+		if(parameterValues.isEmpty())
+			throw new BadRequestHttpException(PHR.r("expected value for parameter '{}' but none was provided", key));
+		
+		return parameterValues.get(0);
+	}
+	
+	@API
+	public <T> T parseQueryParameterValue(String key, Function<String,T> parser)
+			throws BadRequestHttpException
+	{
+		String parameterValueString = getQueryParameterValue(key);
+		try
+		{
+			return parser.apply(parameterValueString);
+		}
+		catch(RuntimeException e)
+		{
+			String error = PHR.r("invalid value for parameter '{}', given: '{}', problem: {}", key, parameterValueString, e.getMessage());
+			throw new BadRequestHttpException(error);
 		}
 	}
 	
@@ -114,69 +187,6 @@ public class HttpRequest
 			throw new BadRequestHttpException(PHR.r("request contained multiple values for header '{}', must be one", key));
 		
 		return Optional.of(headerValues.get(0));
-	}
-	
-	
-	// PARAMETERS
-	@API
-	public List<String> getParameterValuesOrException(String key)
-			throws BadRequestHttpException
-	{
-		if(!queryParameters.containsKey(key))
-			throw new BadRequestHttpException(PHR.r("request is missing query parameter with key '{}'", key));
-		
-		return queryParameters.get(key);
-	}
-	
-	@API
-	public String getParameterValueOrException(String key)
-			throws BadRequestHttpException
-	{
-		var parameterValues = getParameterValuesOrException(key);
-		if(parameterValues.size() > 1)
-			throw new BadRequestHttpException(PHR.r("request contained multiple values for parameter '{}', must be one", key));
-		
-		return Iterables.getOnlyElement(parameterValues);
-	}
-	
-	@API
-	public Optional<List<String>> getParameterValues(String key)
-	{
-		if(!queryParameters.containsKey(key))
-			return Optional.empty();
-		
-		return Optional.of(queryParameters.get(key));
-	}
-	
-	@API
-	public Optional<String> getParameterValue(String key)
-			throws BadRequestHttpException
-	{
-		var parameterValuesOptional = getParameterValues(key);
-		if(parameterValuesOptional.isEmpty())
-			return Optional.empty();
-		
-		var parameterValues = parameterValuesOptional.get();
-		if(parameterValues.size() > 1)
-			throw new BadRequestHttpException(PHR.r("request contained multiple values for parameter '{}', must be one", key));
-		
-		return Optional.of(parameterValues.get(0));
-	}
-	
-	@API
-	public <T> T parseParameterValue(String key, Function<String,T> parser)
-			throws BadRequestHttpException
-	{
-		String parameterValueString = getParameterValueOrException(key);
-		try
-		{
-			return parser.apply(parameterValueString);
-		}
-		catch(RuntimeException e)
-		{
-			String error = PHR.r("invalid value for parameter '{}', given: '{}', problem: {}", key, parameterValueString, e.getMessage());
-			throw new BadRequestHttpException(error);
-		}
 	}
 	
 	

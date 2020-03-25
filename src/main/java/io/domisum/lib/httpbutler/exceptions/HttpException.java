@@ -1,39 +1,28 @@
 package io.domisum.lib.httpbutler.exceptions;
 
-import io.domisum.lib.httpbutler.HttpResponseSender;
-import io.domisum.lib.auxiliumlib.util.java.ExceptionUtil;
-
-public abstract class HttpException extends Exception
+public abstract class HttpException
+		extends Exception
 {
-
+	
+	// CONSTANTS
+	public abstract int ERROR_CODE_INT();
+	
+	public abstract String ERROR_CODE_STRING();
+	
+	
 	// INIT
-	protected HttpException()
-	{
-
-	}
-
 	protected HttpException(String message)
 	{
 		super(message);
 	}
-
-	protected HttpException(String message, Throwable cause)
+	
+	
+	// GETTERS
+	public String getResponseMessage()
 	{
-		super(message, cause);
+		String errorType = ERROR_CODE_INT()+" "+ERROR_CODE_STRING();
+		String response = errorType+": "+getMessage();
+		return response;
 	}
-
-
-	public abstract void sendError(HttpResponseSender responseSender);
-
-
-	// UTIL
-	protected void sendError(HttpResponseSender responseSender, int errorCode, String errorName)
-	{
-		responseSender.setStatusCode(errorCode);
-
-		String causeString = (getCause() == null) ? "" : (" Exception: \n"+ExceptionUtil.convertThrowableToString(getCause()));
-		String response = errorName+(getMessage() == null ? "" : ": "+getMessage())+causeString;
-		responseSender.sendPlaintext(response);
-	}
-
+	
 }

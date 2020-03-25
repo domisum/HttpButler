@@ -1,8 +1,10 @@
 package io.domisum.lib.httpbutler.request;
 
+import io.domisum.lib.auxiliumlib.exceptions.IncompleteCodeError;
+
 public enum HttpMethod
 {
-
+	
 	GET,
 	HEAD,
 	POST,
@@ -12,15 +14,15 @@ public enum HttpMethod
 	OPTIONS,
 	CONNECT,
 	PATCH;
-
-
+	
+	
 	public static HttpMethod fromName(String name)
 	{
-		for(HttpMethod m : values())
-			if(m.name().equalsIgnoreCase(name))
-				return m;
-
-		throw new IllegalArgumentException("Unknown method name: "+name);
+		for(var httpMethod : values())
+			if(httpMethod.name().equalsIgnoreCase(name))
+				return httpMethod;
+		
+		throw new IncompleteCodeError("Unknown http method: "+name);
 	}
-
+	
 }

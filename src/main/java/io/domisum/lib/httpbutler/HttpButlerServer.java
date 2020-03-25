@@ -1,59 +1,48 @@
 package io.domisum.lib.httpbutler;
 
-import io.domisum.lib.auxiliumlib.PHR;
+import com.google.common.collect.Iterables;
 import io.domisum.lib.auxiliumlib.annotations.API;
-import io.domisum.lib.auxiliumlib.contracts.strategy.StrategySelector;
+import io.domisum.lib.auxiliumlib.util.StringUtil;
 import io.domisum.lib.httpbutler.exceptions.HttpException;
 import io.domisum.lib.httpbutler.exceptions.InternalServerErrorHttpException;
-import io.domisum.lib.httpbutler.exceptions.MethodNotAllowedHttpException;
-import io.domisum.lib.httpbutler.preprocessor.HttpRequestPreprocessor;
+import io.domisum.lib.httpbutler.exceptions.NotFoundHttpException;
 import io.domisum.lib.httpbutler.request.HttpMethod;
 import io.domisum.lib.httpbutler.request.HttpRequest;
-import io.domisum.lib.httpbutler.strategy.RequestHandlingStrategy;
-import io.domisum.lib.httpbutler.strategy.strategies.ArgsInPathRequestHandlingStrategy;
-import io.domisum.lib.httpbutler.strategy.strategies.StartingWithRequestHandlingStrategy;
-import io.domisum.lib.httpbutler.strategy.strategies.StaticPathRequestHandlingStrategy;
 import io.undertow.Undertow;
-import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.BlockingHandler;
-import io.undertow.util.HeaderValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @API
 public class HttpButlerServer
 {
-
+	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-
-
+	
+	
 	// SETTINGS
 	private final String host;
 	private final int port;
-
+	
 	private int numberOfIoThreads = Runtime.getRuntime().availableProcessors();
 	private int numberOfWorkerThreads = Runtime.getRuntime().availableProcessors();
-
-	private final List<RequestHandlingStrategy> requestHandlingStrategies = new ArrayList<>();
-	private final RequestHandlingStrategy fallbackHandlingStrategy = null; // TODO
-	private final List<HttpRequestPreprocessor> requestPreprocessors = new ArrayList<>();
-
-	// SERVER
+	
+	// ENDPOINTS
+	private final Set<HttpEndpoint> endpoints = new HashSet<>();
+	
+	// STATUS
 	private Undertow server;
-
-
+	
+	
 	// INIT
 	@API
 	public HttpButlerServer(String host, int port)
@@ -61,8 +50,8 @@ public class HttpButlerServer
 		this.host = host;
 		this.port = port;
 	}
-
-
+	
+	
 	// CONTROL
 	@API
 	public synchronized void start()
@@ -70,185 +59,164 @@ public class HttpButlerServer
 		if(server != null)
 			return;
 		logger.info("Starting {} on {}:{}...", getClass().getSimpleName(), host, port);
-
+		
 		var serverBuilder = Undertow.builder();
-		serverBuilder.addHttpListener(port, host, new BlockingHandler(new HttpButlerServerHttpHandler()));
+		serverBuilder.addHttpListener(port, host, new BlockingHandler(this::handleExchange));
 		serverBuilder.setIoThreads(numberOfIoThreads);
 		serverBuilder.setWorkerThreads(numberOfWorkerThreads);
 		server = serverBuilder.build();
-
+		
 		server.start();
 	}
-
+	
 	@API
 	public synchronized void stop()
 	{
 		if(server == null)
 			return;
-
+		
 		logger.info("Stopping {}...", getClass().getSimpleName());
 		server.stop();
 		server = null;
 	}
-
-
+	
+	
 	// SETTINGS
 	private void validateCanChangeSettings()
 	{
 		if(server != null)
 			throw new IllegalStateException("can't change settings while server is running");
 	}
-
+	
 	@API
 	public synchronized void setNumberOfIoThreads(int numberOfIoThreads)
 	{
 		validateCanChangeSettings();
 		this.numberOfIoThreads = numberOfIoThreads;
 	}
-
+	
 	@API
 	public synchronized void setNumberOfWorkerThreads(int numberOfWorkerThreads)
 	{
 		validateCanChangeSettings();
 		this.numberOfWorkerThreads = numberOfWorkerThreads;
 	}
-
-
-	// HANDLERS REGISTRATION
+	
+	
+	// ENDPOINTS
 	@API
-	public synchronized void registerStaticPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
+	public synchronized void registerEndpoint(HttpEndpoint httpEndpoint)
 	{
-		registerRequestHandlingStrategy(new StaticPathRequestHandlingStrategy(method, path, handler));
+		validateCanChangeSettings();
+		endpoints.add(httpEndpoint);
 	}
-
-	@API
-	public synchronized void registerArgsInPathRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
+	
+	
+	// EXCHANGE
+	private void handleExchange(HttpServerExchange exchange)
+			throws IOException
 	{
-		registerRequestHandlingStrategy(new ArgsInPathRequestHandlingStrategy(method, path, handler));
-	}
-
-	@API
-	public synchronized void registerStartingWithRequestHandler(HttpMethod method, String path, HttpRequestHandler handler)
-	{
-		registerRequestHandlingStrategy(new StartingWithRequestHandlingStrategy(method, path, handler));
-	}
-
-
-	@API
-	public synchronized void registerRequestHandlingStrategy(RequestHandlingStrategy requestHandlingStrategy)
-	{
-		requestHandlingStrategies.add(requestHandlingStrategy);
-	}
-
-	@API
-	public synchronized void registerRequestPreprocessor(HttpRequestPreprocessor requestPreprocessor)
-	{
-		requestPreprocessors.add(requestPreprocessor);
-	}
-
-
-	// REQUEST
-	private HttpRequest buildHttpRequest(HttpServerExchange exchange)
-	{
-		// method
-		HttpMethod method = HttpMethod.fromName(exchange.getRequestMethod().toString());
-
-		// path
-		String requestPath = exchange.getRequestPath();
-
-		// body
-		exchange.startBlocking();
-		InputStream body = exchange.getInputStream();
-
-		// headers
-		Map<String, List<String>> headers = new HashMap<>();
-		for(HeaderValues h : exchange.getRequestHeaders())
+		var responseSender = new HttpResponseSender(exchange);
+		try(var request = buildHttpRequest(exchange))
 		{
-			String headerName = h.getHeaderName().toString().toLowerCase();
-			List<String> values = List.copyOf(h);
-
-			headers.put(headerName, values);
-		}
-		headers = Collections.unmodifiableMap(headers);
-
-		// params
-		Map<String, List<String>> queryParams = new HashMap<>();
-		for(Entry<String, Deque<String>> entry : exchange.getQueryParameters().entrySet())
-			queryParams.put(entry.getKey(), List.copyOf(entry.getValue()));
-		queryParams = Collections.unmodifiableMap(queryParams);
-
-		return new HttpRequest(method, requestPath, headers, queryParams, body);
-	}
-
-	private void handleRequest(HttpRequest request, HttpResponseSender responseSender)
-	{
-		try
-		{
-			handleOrThrowHttpException(request, responseSender);
+			handleRequestCaught(request, responseSender);
 		}
 		catch(HttpException e)
 		{
-			e.sendError(responseSender);
-		}
-		catch(Throwable e)
-		{
-			new InternalServerErrorHttpException("an error occured while processing the request", e).sendError(responseSender);
-
-			if(e instanceof Error)
-				throw e;
-			else
-				logger.error("an error occured while processing the request", e);
-		}
-	}
-
-	private void handleOrThrowHttpException(HttpRequest rawRequest, HttpResponseSender responseSender) throws HttpException
-	{
-		HttpRequest request = preprocessRequest(rawRequest);
-
-		HttpRequestHandler requestHandler = selectRequestHandler(request);
-		logger.debug("Processing request {} in handler {}...", request, requestHandler);
-		requestHandler.handleRequest(request, responseSender);
-	}
-
-	private HttpRequest preprocessRequest(HttpRequest rawRequest) throws HttpException
-	{
-		HttpRequest r = rawRequest;
-		for(HttpRequestPreprocessor rpp : requestPreprocessors)
-			r = rpp.preprocess(r);
-
-		return r;
-	}
-
-	private HttpRequestHandler selectRequestHandler(HttpRequest request) throws MethodNotAllowedHttpException
-	{
-		Optional<RequestHandlingStrategy> handlingStrategy = new StrategySelector<>(requestHandlingStrategies,
-				fallbackHandlingStrategy
-		).selectFirstApplicable(request);
-
-		if(handlingStrategy.isEmpty())
-			throw new MethodNotAllowedHttpException(PHR.r("Server unable to process method {} on path '{}'",
-					request.getMethod(),
-					request.getPath()
-			));
-
-		return handlingStrategy.get().getHandler();
-	}
-
-
-	// UNDERTOW HANDLER
-	private class HttpButlerServerHttpHandler implements HttpHandler
-	{
-
-		@Override
-		public void handleRequest(HttpServerExchange exchange) throws IOException
-		{
-			try(HttpRequest request = buildHttpRequest(exchange))
+			if(responseSender.isSent())
 			{
-				HttpResponseSender responseSender = new HttpResponseSender(exchange);
-				HttpButlerServer.this.handleRequest(request, responseSender);
+				logger.error("Can't throw http exception after already sending response");
+				return;
 			}
+			
+			exchange.setStatusCode(e.ERROR_CODE_INT());
+			exchange.getResponseSender().send(e.getResponseMessage());
 		}
-
 	}
-
+	
+	private HttpRequest buildHttpRequest(HttpServerExchange exchange)
+	{
+		var method = HttpMethod.fromName(exchange.getRequestMethod().toString());
+		String requestPath = exchange.getRequestPath();
+		var body = exchange.getInputStream();
+		
+		var queryParams = new HashMap<String,List<String>>();
+		for(var entry : exchange.getQueryParameters().entrySet())
+			queryParams.put(entry.getKey().toLowerCase(), List.copyOf(entry.getValue()));
+		
+		var headers = new HashMap<String,List<String>>();
+		for(var headerValues : exchange.getRequestHeaders())
+		{
+			String headerName = headerValues.getHeaderName().toString().toLowerCase();
+			var values = List.copyOf(headerValues);
+			headers.put(headerName, values);
+		}
+		
+		return new HttpRequest(method, requestPath, headers, queryParams, body);
+	}
+	
+	private void handleRequestCaught(HttpRequest request, HttpResponseSender responseSender)
+			throws HttpException
+	{
+		try
+		{
+			handleRequest(request, responseSender);
+		}
+		catch(RuntimeException e)
+		{
+			logger.error("an error occured while processing the request", e);
+			throw new InternalServerErrorHttpException("an unexpected error occured while processing the request");
+		}
+	}
+	
+	private void handleRequest(HttpRequest request, HttpResponseSender responseSender)
+			throws HttpException
+	{
+		var requestHandler = selectEndpoint(request);
+		
+		logger.debug("Processing request {} in handler {}", request, requestHandler.getClass().getSimpleName());
+		requestHandler.handleRequest(request, responseSender);
+		
+		if(!responseSender.isSent())
+			logger.error("Request handler {} didn't send any response", requestHandler);
+	}
+	
+	private HttpEndpoint selectEndpoint(HttpRequest request)
+			throws NotFoundHttpException, InternalServerErrorHttpException
+	{
+		var endpointAcceptances = new HashMap<HttpEndpoint,Double>();
+		for(var endpoint : endpoints)
+		{
+			double acceptance = endpoint.getAcceptance(request);
+			if(acceptance > HttpEndpoint.DOES_NOT_ACCEPT)
+				endpointAcceptances.put(endpoint, acceptance);
+		}
+		
+		// no endpoint accepts this request
+		if(endpointAcceptances.isEmpty())
+			throw new NotFoundHttpException("No endpoint registered for handling this request");
+		
+		// endpoints tied
+		double maxAcceptance = endpointAcceptances.values().stream()
+				.max(Double::compareTo)
+				.orElseThrow();
+		var endpointsWithMaxAcceptance = endpointAcceptances.entrySet().stream()
+				.filter(e->e.getValue() == maxAcceptance)
+				.map(Entry::getKey)
+				.collect(Collectors.toSet());
+		if(endpointsWithMaxAcceptance.size() > 1)
+		{
+			var tiedEndpointNames = endpointsWithMaxAcceptance.stream()
+					.map(e->e.getClass().getSimpleName())
+					.collect(Collectors.toSet());
+			String tieDisplayString = StringUtil.collectionToString(tiedEndpointNames, ",")+" (acceptance: "+maxAcceptance+")";
+			
+			logger.error("Multiple endpoints tied for handling request: {}; request:\n{}", tieDisplayString, request);
+			throw new InternalServerErrorHttpException("Multiple endpoints tied for handling this request: "+tieDisplayString);
+		}
+		
+		// one endpoint found
+		return Iterables.getOnlyElement(endpointsWithMaxAcceptance);
+	}
+	
 }
