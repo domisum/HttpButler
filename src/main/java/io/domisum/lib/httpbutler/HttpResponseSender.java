@@ -19,7 +19,7 @@ public class HttpResponseSender
 	private final HttpServerExchange undertowExchange;
 	
 	// STATUS
-	@Getter(AccessLevel.PROTECTED) // TODO check this?
+	@Getter(AccessLevel.PROTECTED)
 	private boolean sent = false;
 	
 	
