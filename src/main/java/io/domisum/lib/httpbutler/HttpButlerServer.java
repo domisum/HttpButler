@@ -1,5 +1,8 @@
 package io.domisum.lib.httpbutler;
 
+import io.domisum.lib.auxiliumlib.PHR;
+import io.domisum.lib.auxiliumlib.annotations.API;
+import io.domisum.lib.auxiliumlib.contracts.strategy.StrategySelector;
 import io.domisum.lib.httpbutler.exceptions.HttpException;
 import io.domisum.lib.httpbutler.exceptions.InternalServerErrorHttpException;
 import io.domisum.lib.httpbutler.exceptions.MethodNotAllowedHttpException;
@@ -10,11 +13,7 @@ import io.domisum.lib.httpbutler.strategy.RequestHandlingStrategy;
 import io.domisum.lib.httpbutler.strategy.strategies.ArgsInPathRequestHandlingStrategy;
 import io.domisum.lib.httpbutler.strategy.strategies.StartingWithRequestHandlingStrategy;
 import io.domisum.lib.httpbutler.strategy.strategies.StaticPathRequestHandlingStrategy;
-import io.domisum.lib.auxiliumlib.contracts.strategy.StrategySelector;
-import io.domisum.lib.auxiliumlib.PHR;
-import io.domisum.lib.auxiliumlib.annotations.API;
 import io.undertow.Undertow;
-import io.undertow.Undertow.Builder;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.BlockingHandler;
@@ -72,7 +71,7 @@ public class HttpButlerServer
 			return;
 		logger.info("Starting {} on {}:{}...", getClass().getSimpleName(), host, port);
 
-		Builder serverBuilder = Undertow.builder();
+		var serverBuilder = Undertow.builder();
 		serverBuilder.addHttpListener(port, host, new BlockingHandler(new HttpButlerServerHttpHandler()));
 		serverBuilder.setIoThreads(numberOfIoThreads);
 		serverBuilder.setWorkerThreads(numberOfWorkerThreads);
