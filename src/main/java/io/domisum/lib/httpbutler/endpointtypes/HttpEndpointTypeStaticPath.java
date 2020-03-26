@@ -17,7 +17,7 @@ public abstract class HttpEndpointTypeStaticPath
 		if(METHOD() != request.getMethod())
 			return DOES_NOT_ACCEPT;
 		
-		String endpointPath = PATH();
+		String endpointPath = HttpRequest.cleanUpPath(PATH());
 		if(!endpointPath.equalsIgnoreCase(request.getPath()))
 			return DOES_NOT_ACCEPT;
 		

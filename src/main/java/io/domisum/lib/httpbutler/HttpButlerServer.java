@@ -137,7 +137,7 @@ public class HttpButlerServer
 	private HttpRequest buildHttpRequest(HttpServerExchange exchange)
 	{
 		var method = HttpMethod.fromName(exchange.getRequestMethod().toString());
-		String requestPath = exchange.getRequestPath();
+		String path = HttpRequest.cleanUpPath(exchange.getRequestPath());
 		var body = exchange.getInputStream();
 		
 		var queryParams = new HashMap<String,List<String>>();
@@ -152,7 +152,7 @@ public class HttpButlerServer
 			headers.put(headerName, values);
 		}
 		
-		return new HttpRequest(method, requestPath, headers, queryParams, body);
+		return new HttpRequest(method, path, headers, queryParams, body);
 	}
 	
 	private void handleRequestCaught(HttpRequest request, HttpResponseSender responseSender)

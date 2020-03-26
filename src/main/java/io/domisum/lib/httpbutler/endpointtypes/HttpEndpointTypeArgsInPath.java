@@ -24,7 +24,7 @@ public abstract class HttpEndpointTypeArgsInPath
 		if(METHOD() != request.getMethod())
 			return DOES_NOT_ACCEPT;
 		
-		String endpointPathWithPlaceholders = PATH_WITH_PLACEHOLDERS().toLowerCase();
+		String endpointPathWithPlaceholders = HttpRequest.cleanUpPath(PATH_WITH_PLACEHOLDERS()).toLowerCase();
 		String pathWithPlaceholdersEscaped = StringUtil.escapeStringForRegex(endpointPathWithPlaceholders);
 		String pathRegex = "^"+pathWithPlaceholdersEscaped.replace(PLACEHOLDER, PARAMETER_REGEX)+"$";
 		
