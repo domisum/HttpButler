@@ -21,7 +21,8 @@ public abstract class HttpEndpointTypeStaticPath
 		if(!endpointPath.equalsIgnoreCase(request.getPath()))
 			return DOES_NOT_ACCEPT;
 		
-		return endpointPath.length()+(1d/2); // add some to trump "starts with" endpoint type
+		final double baseAcceptance = 0.9;
+		return endpointPath.length()+baseAcceptance; // add some to trump "starts with" endpoint type
 	}
 	
 	@API

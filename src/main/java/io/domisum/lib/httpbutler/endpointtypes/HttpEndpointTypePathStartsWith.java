@@ -21,7 +21,8 @@ public abstract class HttpEndpointTypePathStartsWith
 		if(!request.getPath().toLowerCase().startsWith(endpointPathStart.toLowerCase()))
 			return DOES_NOT_ACCEPT;
 		
-		return endpointPathStart.length();
+		final double baseAcceptance = 0.1;
+		return endpointPathStart.length()+baseAcceptance; // add some to avoid returning 0 for empty path
 	}
 	
 	protected abstract HttpMethod METHOD();
