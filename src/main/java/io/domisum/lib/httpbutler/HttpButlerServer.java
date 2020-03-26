@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +38,7 @@ public class HttpButlerServer
 	private int numberOfWorkerThreads = Runtime.getRuntime().availableProcessors();
 	
 	// ENDPOINTS
-	private final Set<HttpEndpoint> endpoints = new HashSet<>();
+	private final Set<HttpButlerEndpoint> endpoints = new HashSet<>();
 	
 	// STATUS
 	private Undertow server;
@@ -49,6 +50,13 @@ public class HttpButlerServer
 	{
 		this.host = host;
 		this.port = port;
+	}
+	
+	@API
+	public HttpButlerServer(String host, int port, Collection<HttpButlerEndpoint> endpoints)
+	{
+		this(host, port);
+		registerEndpoints(endpoints);
 	}
 	
 	
@@ -105,10 +113,17 @@ public class HttpButlerServer
 	
 	// ENDPOINTS
 	@API
-	public synchronized void registerEndpoint(HttpEndpoint httpEndpoint)
+	public synchronized void registerEndpoint(HttpButlerEndpoint endpoint)
 	{
 		validateCanChangeSettings();
-		endpoints.add(httpEndpoint);
+		endpoints.add(endpoint);
+	}
+	
+	@API
+	public synchronized void registerEndpoints(Collection<HttpButlerEndpoint> endpoints)
+	{
+		validateCanChangeSettings();
+		this.endpoints.addAll(endpoints);
 	}
 	
 	
@@ -181,14 +196,14 @@ public class HttpButlerServer
 			logger.error("Request handler {} didn't send any response", requestHandler);
 	}
 	
-	private HttpEndpoint selectEndpoint(HttpRequest request)
+	private HttpButlerEndpoint selectEndpoint(HttpRequest request)
 			throws NotFoundHttpException, InternalServerErrorHttpException
 	{
-		var endpointAcceptances = new HashMap<HttpEndpoint,Double>();
+		var endpointAcceptances = new HashMap<HttpButlerEndpoint,Double>();
 		for(var endpoint : endpoints)
 		{
 			double acceptance = endpoint.getAcceptance(request);
-			if(acceptance > HttpEndpoint.DOES_NOT_ACCEPT)
+			if(acceptance > HttpButlerEndpoint.DOES_NOT_ACCEPT)
 				endpointAcceptances.put(endpoint, acceptance);
 		}
 		

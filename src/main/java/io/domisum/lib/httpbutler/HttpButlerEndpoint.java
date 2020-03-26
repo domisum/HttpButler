@@ -4,7 +4,7 @@ import io.domisum.lib.auxiliumlib.annotations.API;
 import io.domisum.lib.httpbutler.exceptions.HttpException;
 import io.domisum.lib.httpbutler.request.HttpRequest;
 
-public abstract class HttpEndpoint
+public abstract class HttpButlerEndpoint
 {
 	
 	// CONSTANTS

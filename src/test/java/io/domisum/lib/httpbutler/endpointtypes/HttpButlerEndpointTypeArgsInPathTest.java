@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 
-public class HttpEndpointTypeArgsInPathTest
+public class HttpButlerEndpointTypeArgsInPathTest
 {
 	
 	@Test
@@ -41,10 +41,10 @@ public class HttpEndpointTypeArgsInPathTest
 	
 	
 	// ARRANGE
-	private HttpEndpointTypeArgsInPath createArgsInPathEndpoint(String pathWithPlaceholders)
+	private HttpButlerEndpointTypeArgsInPath createArgsInPathEndpoint(String pathWithPlaceholders)
 	{
 		// noinspection AnonymousInnerClassWithTooManyMethods
-		return new HttpEndpointTypeArgsInPath()
+		return new HttpButlerEndpointTypeArgsInPath()
 		{
 			
 			@Override
@@ -75,12 +75,12 @@ public class HttpEndpointTypeArgsInPathTest
 	
 	
 	// ASSERT
-	private void assertDoesAccept(HttpEndpointTypeArgsInPath endpoint, HttpRequest request)
+	private void assertDoesAccept(HttpButlerEndpointTypeArgsInPath endpoint, HttpRequest request)
 	{
 		Assertions.assertTrue(endpoint.getAcceptance(request) > 0, "endpoint didn't accept request, but was supposed to:\n"+request);
 	}
 	
-	private void assertDoesNotAccept(HttpEndpointTypeArgsInPath endpoint, HttpRequest request)
+	private void assertDoesNotAccept(HttpButlerEndpointTypeArgsInPath endpoint, HttpRequest request)
 	{
 		Assertions.assertEquals(0, endpoint.getAcceptance(request), "endpoint accepted request, but wasn't supposed to:\n"+request);
 	}

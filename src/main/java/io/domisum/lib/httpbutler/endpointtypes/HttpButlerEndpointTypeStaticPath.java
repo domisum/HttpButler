@@ -1,13 +1,13 @@
 package io.domisum.lib.httpbutler.endpointtypes;
 
 import io.domisum.lib.auxiliumlib.annotations.API;
-import io.domisum.lib.httpbutler.HttpEndpoint;
+import io.domisum.lib.httpbutler.HttpButlerEndpoint;
 import io.domisum.lib.httpbutler.request.HttpMethod;
 import io.domisum.lib.httpbutler.request.HttpRequest;
 
 @API
-public abstract class HttpEndpointTypeStaticPath
-		extends HttpEndpoint
+public abstract class HttpButlerEndpointTypeStaticPath
+		extends HttpButlerEndpoint
 {
 	
 	// ACCEPTANCE
