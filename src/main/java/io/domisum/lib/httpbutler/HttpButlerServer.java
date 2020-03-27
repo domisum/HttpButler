@@ -167,7 +167,7 @@ public class HttpButlerServer
 			headers.put(headerName, values);
 		}
 		
-		return new HttpRequest(method, path, headers, queryParams, body);
+		return new HttpRequest(method, path, queryParams, headers, body);
 	}
 	
 	private void handleRequestCaught(HttpRequest request, HttpResponseSender responseSender)
