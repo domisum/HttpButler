@@ -6,19 +6,18 @@ import io.domisum.lib.auxiliumlib.annotations.API;
 import io.domisum.lib.auxiliumlib.util.StringUtil;
 import io.domisum.lib.httpbutler.exceptions.BadRequestHttpException;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-@RequiredArgsConstructor
 public class HttpRequest
 		implements AutoCloseable
 {
@@ -33,6 +32,20 @@ public class HttpRequest
 	
 	@Getter
 	private final InputStream body;
+	
+	
+	// INIT
+	public HttpRequest(HttpMethod method, String path,
+			Map<String,List<String>> queryParameters, Map<String,List<String>> headers,
+			InputStream body)
+	{
+		this.method = method;
+		this.path = cleanUpPath(path);
+		
+		this.queryParameters = new HashMap<>(queryParameters);
+		this.headers = new HashMap<>(headers);
+		this.body = body;
+	}
 	
 	
 	// OBJECT
