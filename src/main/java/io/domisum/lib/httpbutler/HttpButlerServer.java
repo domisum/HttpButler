@@ -155,19 +155,15 @@ public class HttpButlerServer
 		String path = exchange.getRequestPath();
 		var body = exchange.getInputStream();
 		
-		var queryParams = new HashMap<String,List<String>>();
+		var queryParameters = new HashMap<String,List<String>>();
 		for(var entry : exchange.getQueryParameters().entrySet())
-			queryParams.put(entry.getKey().toLowerCase(), List.copyOf(entry.getValue()));
+			queryParameters.put(entry.getKey(), List.copyOf(entry.getValue()));
 		
 		var headers = new HashMap<String,List<String>>();
 		for(var headerValues : exchange.getRequestHeaders())
-		{
-			String headerName = headerValues.getHeaderName().toString().toLowerCase();
-			var values = List.copyOf(headerValues);
-			headers.put(headerName, values);
-		}
+			headers.put(headerValues.getHeaderName().toString(), List.copyOf(headerValues));
 		
-		return new HttpRequest(method, path, queryParams, headers, body);
+		return new HttpRequest(method, path, queryParameters, headers, body);
 	}
 	
 	private void handleRequestCaught(HttpRequest request, HttpResponseSender responseSender)

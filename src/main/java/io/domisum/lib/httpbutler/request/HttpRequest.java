@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,14 +37,21 @@ public class HttpRequest
 	
 	// INIT
 	public HttpRequest(HttpMethod method, String path,
-			Map<String,List<String>> queryParameters, Map<String,List<String>> headers,
-			InputStream body)
+			Map<String,List<String>> queryParameters, Map<String,List<String>> headers, InputStream body)
 	{
 		this.method = method;
 		this.path = cleanUpPath(path);
 		
-		this.queryParameters = new HashMap<>(queryParameters);
-		this.headers = new HashMap<>(headers);
+		var queryParametersCleaned = new HashMap<String,List<String>>();
+		for(var entry : queryParameters.entrySet())
+			queryParametersCleaned.put(entry.getKey().toLowerCase(), List.copyOf(entry.getValue()));
+		this.queryParameters = Collections.unmodifiableMap(queryParametersCleaned);
+		
+		var headersCleaned = new HashMap<String,List<String>>();
+		for(var entry : headers.entrySet())
+			headersCleaned.put(entry.getKey().toLowerCase(), List.copyOf(entry.getValue()));
+		this.headers = Collections.unmodifiableMap(headersCleaned);
+		
 		this.body = body;
 	}
 	
