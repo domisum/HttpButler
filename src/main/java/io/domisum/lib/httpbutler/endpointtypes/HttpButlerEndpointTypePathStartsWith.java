@@ -10,6 +10,12 @@ public abstract class HttpButlerEndpointTypePathStartsWith
 		extends HttpButlerEndpoint
 {
 	
+	// CONSTANT METHODS
+	protected abstract HttpMethod METHOD();
+	
+	protected abstract String PATH_START();
+	
+	
 	// ACCEPTANCE
 	@Override
 	protected double getAcceptance(HttpRequest request)
@@ -24,9 +30,5 @@ public abstract class HttpButlerEndpointTypePathStartsWith
 		final double baseAcceptance = 0.1;
 		return endpointPathStart.length()+baseAcceptance; // add some to avoid returning 0 for empty path
 	}
-	
-	protected abstract HttpMethod METHOD();
-	
-	protected abstract String PATH_START();
 	
 }

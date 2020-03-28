@@ -10,6 +10,14 @@ public abstract class HttpButlerEndpointTypeStaticPath
 		extends HttpButlerEndpoint
 {
 	
+	// CONSTANT METHODS
+	@API
+	protected abstract HttpMethod METHOD();
+	
+	@API
+	protected abstract String PATH();
+	
+	
 	// ACCEPTANCE
 	@Override
 	protected double getAcceptance(HttpRequest request)
@@ -24,11 +32,5 @@ public abstract class HttpButlerEndpointTypeStaticPath
 		final double baseAcceptance = 0.9;
 		return endpointPath.length()+baseAcceptance; // add some to trump "starts with" endpoint type
 	}
-	
-	@API
-	protected abstract HttpMethod METHOD();
-	
-	@API
-	protected abstract String PATH();
 	
 }

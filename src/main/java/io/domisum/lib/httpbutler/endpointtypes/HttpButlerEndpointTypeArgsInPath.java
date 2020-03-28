@@ -17,6 +17,14 @@ public abstract class HttpButlerEndpointTypeArgsInPath
 	private static final String PARAMETER_REGEX = "[0-9a-zA-Z-_%\\.]+";
 	
 	
+	// CONSTANT METHODS
+	@API
+	protected abstract HttpMethod METHOD();
+	
+	@API
+	protected abstract String PATH_WITH_PLACEHOLDERS();
+	
+	
 	// ACCEPTANCE
 	@Override
 	protected double getAcceptance(HttpRequest request)
@@ -34,11 +42,5 @@ public abstract class HttpButlerEndpointTypeArgsInPath
 		
 		return endpointPathWithPlaceholders.length();
 	}
-	
-	@API
-	protected abstract HttpMethod METHOD();
-	
-	@API
-	protected abstract String PATH_WITH_PLACEHOLDERS();
 	
 }
