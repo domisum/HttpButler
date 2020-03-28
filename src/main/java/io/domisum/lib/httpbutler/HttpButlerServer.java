@@ -131,24 +131,49 @@ public class HttpButlerServer
 	private void handleExchange(HttpServerExchange exchange)
 			throws IOException
 	{
-		var responseSender = new HttpResponseSender(exchange);
 		try(var request = buildHttpRequest(exchange))
 		{
-			handleRequestCaught(request, responseSender);
+			var httpResponse = handleRequestCatchInternalErrors(request);
+			httpResponse.send(exchange);
 		}
 		catch(HttpException e)
 		{
-			if(responseSender.isSent())
-			{
-				logger.error("Can't throw http exception after already sending response");
-				return;
-			}
-			
 			exchange.setStatusCode(e.ERROR_CODE_INT());
 			exchange.getResponseSender().send(e.getResponseMessage());
 		}
 	}
 	
+	private HttpResponse handleRequestCatchInternalErrors(HttpRequest request)
+			throws HttpException
+	{
+		try
+		{
+			return handleRequest(request);
+		}
+		catch(RuntimeException e)
+		{
+			logger.error("an error occured while processing the request", e);
+			throw new InternalServerErrorHttpException("an unexpected error occured while processing the request");
+		}
+	}
+	
+	private HttpResponse handleRequest(HttpRequest request)
+			throws HttpException
+	{
+		var endpoint = selectEndpoint(request);
+		logger.debug("Processing request {} in endpoint {}", request, endpoint);
+		var httpResponse = endpoint.handleRequest(request);
+		if(httpResponse == null)
+		{
+			logger.error("Endpoint {} returned null as response", endpoint);
+			throw new InternalServerErrorHttpException("the endpoint did not return a response");
+		}
+		
+		return httpResponse;
+	}
+	
+	
+	// UTIL
 	private HttpRequest buildHttpRequest(HttpServerExchange exchange)
 	{
 		var method = HttpMethod.fromName(exchange.getRequestMethod().toString());
@@ -164,32 +189,6 @@ public class HttpButlerServer
 			headers.put(headerValues.getHeaderName().toString(), List.copyOf(headerValues));
 		
 		return new HttpRequest(method, path, queryParameters, headers, body);
-	}
-	
-	private void handleRequestCaught(HttpRequest request, HttpResponseSender responseSender)
-			throws HttpException
-	{
-		try
-		{
-			handleRequest(request, responseSender);
-		}
-		catch(RuntimeException e)
-		{
-			logger.error("an error occured while processing the request", e);
-			throw new InternalServerErrorHttpException("an unexpected error occured while processing the request");
-		}
-	}
-	
-	private void handleRequest(HttpRequest request, HttpResponseSender responseSender)
-			throws HttpException
-	{
-		var requestHandler = selectEndpoint(request);
-		
-		logger.debug("Processing request {} in handler {}", request, requestHandler.getClass().getSimpleName());
-		requestHandler.handleRequest(request, responseSender);
-		
-		if(!responseSender.isSent())
-			logger.error("Request handler {} didn't send any response", requestHandler);
 	}
 	
 	private HttpButlerEndpoint selectEndpoint(HttpRequest request)

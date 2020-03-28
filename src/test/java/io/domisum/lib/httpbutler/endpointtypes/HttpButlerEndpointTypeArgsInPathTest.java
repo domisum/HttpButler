@@ -1,6 +1,6 @@
 package io.domisum.lib.httpbutler.endpointtypes;
 
-import io.domisum.lib.httpbutler.HttpResponseSender;
+import io.domisum.lib.httpbutler.HttpResponse;
 import io.domisum.lib.httpbutler.request.HttpMethod;
 import io.domisum.lib.httpbutler.request.HttpRequest;
 import org.junit.jupiter.api.Assertions;
@@ -60,9 +60,9 @@ public class HttpButlerEndpointTypeArgsInPathTest
 			}
 			
 			@Override
-			protected void handleRequest(HttpRequest request, HttpResponseSender responseSender)
+			protected HttpResponse handleRequest(HttpRequest request)
 			{
-				// do nothing
+				return null;
 			}
 			
 		};

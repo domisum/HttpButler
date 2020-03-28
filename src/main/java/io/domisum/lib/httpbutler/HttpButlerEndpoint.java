@@ -15,7 +15,7 @@ public abstract class HttpButlerEndpoint
 	protected abstract double getAcceptance(HttpRequest request);
 	
 	@API
-	protected abstract void handleRequest(HttpRequest request, HttpResponseSender responseSender)
+	protected abstract HttpResponse handleRequest(HttpRequest request)
 			throws HttpException;
 	
 }
