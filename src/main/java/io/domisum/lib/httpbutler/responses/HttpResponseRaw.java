@@ -29,7 +29,7 @@ public class HttpResponseRaw
 	
 	// SEND
 	@Override
-	protected void send(HttpServerExchange httpServerExchange)
+	protected void sendSpecific(HttpServerExchange httpServerExchange)
 	{
 		httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType);
 		httpServerExchange.getResponseSender().send(ByteBuffer.wrap(content));

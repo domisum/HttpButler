@@ -14,7 +14,7 @@ public class HttpResponseNoBody
 	
 	// SEND
 	@Override
-	protected void send(HttpServerExchange httpServerExchange)
+	protected void sendSpecific(HttpServerExchange httpServerExchange)
 	{
 		httpServerExchange.setStatusCode(StatusCodes.NO_CONTENT);
 	}
