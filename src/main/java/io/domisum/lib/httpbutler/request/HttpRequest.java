@@ -4,7 +4,7 @@ import com.google.common.collect.Iterables;
 import io.domisum.lib.auxiliumlib.PHR;
 import io.domisum.lib.auxiliumlib.annotations.API;
 import io.domisum.lib.auxiliumlib.util.StringUtil;
-import io.domisum.lib.httpbutler.exceptions.BadRequestHttpException;
+import io.domisum.lib.httpbutler.exceptions.HttpBadRequest;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
@@ -88,19 +88,19 @@ public class HttpRequest
 	// PATH
 	@API
 	public String getPathSegment(int segmentIndex)
-			throws BadRequestHttpException
+			throws HttpBadRequest
 	{
 		String[] pathSplit = path.split(StringUtil.escapeStringForRegex("/"));
 		
 		if(segmentIndex >= pathSplit.length)
-			throw new BadRequestHttpException("request did not contain path segment on index "+segmentIndex);
+			throw new HttpBadRequest("request did not contain path segment on index "+segmentIndex);
 		
 		return pathSplit[segmentIndex];
 	}
 	
 	@API
 	public <T> T parsePathSegment(int segmentIndex, Function<String,T> parser)
-			throws BadRequestHttpException
+			throws HttpBadRequest
 	{
 		String pathSegmentString = getPathSegment(segmentIndex);
 		try
@@ -110,7 +110,7 @@ public class HttpRequest
 		catch(RuntimeException e)
 		{
 			String error = PHR.r("invalid value for path segment at index {}, given: '{}', problem: {}", segmentIndex, pathSegmentString, e.getMessage());
-			throw new BadRequestHttpException(error);
+			throw new HttpBadRequest(error);
 		}
 	}
 	
@@ -129,22 +129,22 @@ public class HttpRequest
 	
 	@API
 	public String getQueryParameterValue(String key)
-			throws BadRequestHttpException
+			throws HttpBadRequest
 	{
 		key = key.toLowerCase();
 		var parameterValues = getQueryParameterValues(key);
 		
 		if(parameterValues.size() > 1)
-			throw new BadRequestHttpException(PHR.r("request contained multiple values for paramenter '{}' but only one is expected", key));
+			throw new HttpBadRequest(PHR.r("request contained multiple values for paramenter '{}' but only one is expected", key));
 		if(parameterValues.isEmpty())
-			throw new BadRequestHttpException(PHR.r("expected value for parameter '{}' but none was provided", key));
+			throw new HttpBadRequest(PHR.r("expected value for parameter '{}' but none was provided", key));
 		
 		return parameterValues.get(0);
 	}
 	
 	@API
 	public <T> T parseQueryParameterValue(String key, Function<String,T> parser)
-			throws BadRequestHttpException
+			throws HttpBadRequest
 	{
 		String parameterValueString = getQueryParameterValue(key);
 		try
@@ -154,7 +154,7 @@ public class HttpRequest
 		catch(RuntimeException e)
 		{
 			String error = PHR.r("invalid value for parameter '{}', given: '{}', problem: {}", key, parameterValueString, e.getMessage());
-			throw new BadRequestHttpException(error);
+			throw new HttpBadRequest(error);
 		}
 	}
 	
@@ -162,21 +162,21 @@ public class HttpRequest
 	// HEADERS
 	@API
 	public List<String> getHeaderValues(String key)
-			throws BadRequestHttpException
+			throws HttpBadRequest
 	{
 		if(!headers.containsKey(key.toLowerCase()))
-			throw new BadRequestHttpException(PHR.r("request is missing header with key '{}'", key));
+			throw new HttpBadRequest(PHR.r("request is missing header with key '{}'", key));
 		
 		return headers.get(key.toLowerCase());
 	}
 	
 	@API
 	public String getHeaderValue(String key)
-			throws BadRequestHttpException
+			throws HttpBadRequest
 	{
 		var headerValues = getHeaderValues(key);
 		if(headerValues.size() > 1)
-			throw new BadRequestHttpException(PHR.r("request contained multiple values for header '{}', must be one", key));
+			throw new HttpBadRequest(PHR.r("request contained multiple values for header '{}', must be one", key));
 		
 		return Iterables.getOnlyElement(headerValues);
 	}

@@ -4,7 +4,7 @@ import io.domisum.lib.auxiliumlib.annotations.API;
 import io.undertow.util.StatusCodes;
 
 @API
-public class ForbiddenHttpException
+public class HttpBadRequest
 		extends HttpException
 {
 	
@@ -12,19 +12,19 @@ public class ForbiddenHttpException
 	@Override
 	public int ERROR_CODE_INT()
 	{
-		return StatusCodes.FORBIDDEN;
+		return StatusCodes.BAD_REQUEST;
 	}
 	
 	@Override
 	public String ERROR_CODE_STRING()
 	{
-		return StatusCodes.FORBIDDEN_STRING;
+		return StatusCodes.BAD_REQUEST_STRING;
 	}
 	
 	
 	// INIT
 	@API
-	public ForbiddenHttpException(String message)
+	public HttpBadRequest(String message)
 	{
 		super(message);
 	}

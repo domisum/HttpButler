@@ -4,8 +4,8 @@ import com.google.common.collect.Iterables;
 import io.domisum.lib.auxiliumlib.annotations.API;
 import io.domisum.lib.auxiliumlib.util.StringUtil;
 import io.domisum.lib.httpbutler.exceptions.HttpException;
-import io.domisum.lib.httpbutler.exceptions.InternalServerErrorHttpException;
-import io.domisum.lib.httpbutler.exceptions.NotFoundHttpException;
+import io.domisum.lib.httpbutler.exceptions.HttpInternalServerError;
+import io.domisum.lib.httpbutler.exceptions.HttpNotFound;
 import io.domisum.lib.httpbutler.request.HttpMethod;
 import io.domisum.lib.httpbutler.request.HttpRequest;
 import io.undertow.Undertow;
@@ -153,7 +153,7 @@ public class HttpButlerServer
 		catch(RuntimeException e)
 		{
 			logger.error("an error occured while processing the request", e);
-			throw new InternalServerErrorHttpException("an unexpected error occured while processing the request");
+			throw new HttpInternalServerError("an unexpected error occured while processing the request");
 		}
 	}
 	
@@ -166,7 +166,7 @@ public class HttpButlerServer
 		if(httpResponse == null)
 		{
 			logger.error("Endpoint {} returned null as response", endpoint);
-			throw new InternalServerErrorHttpException("the endpoint did not return a response");
+			throw new HttpInternalServerError("the endpoint did not return a response");
 		}
 		
 		return httpResponse;
@@ -192,7 +192,7 @@ public class HttpButlerServer
 	}
 	
 	private HttpButlerEndpoint selectEndpoint(HttpRequest request)
-			throws NotFoundHttpException, InternalServerErrorHttpException
+			throws HttpNotFound, HttpInternalServerError
 	{
 		var endpointAcceptances = new HashMap<HttpButlerEndpoint,Double>();
 		for(var endpoint : endpoints)
@@ -204,7 +204,7 @@ public class HttpButlerServer
 		
 		// no endpoint accepts this request
 		if(endpointAcceptances.isEmpty())
-			throw new NotFoundHttpException("No endpoint registered for handling this request");
+			throw new HttpNotFound("No endpoint registered for handling this request");
 		
 		// endpoints tied
 		double maxAcceptance = endpointAcceptances.values().stream()
@@ -222,7 +222,7 @@ public class HttpButlerServer
 			String tieDisplayString = StringUtil.collectionToString(tiedEndpointNames, ",")+" (acceptance: "+maxAcceptance+")";
 			
 			logger.error("Multiple endpoints tied for handling request: {}; request:\n{}", tieDisplayString, request);
-			throw new InternalServerErrorHttpException("Multiple endpoints tied for handling this request: "+tieDisplayString);
+			throw new HttpInternalServerError("Multiple endpoints tied for handling this request: "+tieDisplayString);
 		}
 		
 		// one endpoint found

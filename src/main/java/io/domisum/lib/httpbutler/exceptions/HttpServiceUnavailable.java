@@ -4,7 +4,7 @@ import io.domisum.lib.auxiliumlib.annotations.API;
 import io.undertow.util.StatusCodes;
 
 @API
-public class BadRequestHttpException
+public class HttpServiceUnavailable
 		extends HttpException
 {
 	
@@ -12,19 +12,19 @@ public class BadRequestHttpException
 	@Override
 	public int ERROR_CODE_INT()
 	{
-		return StatusCodes.BAD_REQUEST;
+		return StatusCodes.SERVICE_UNAVAILABLE;
 	}
 	
 	@Override
 	public String ERROR_CODE_STRING()
 	{
-		return StatusCodes.BAD_REQUEST_STRING;
+		return StatusCodes.SERVICE_UNAVAILABLE_STRING;
 	}
 	
 	
 	// INIT
 	@API
-	public BadRequestHttpException(String message)
+	public HttpServiceUnavailable(String message)
 	{
 		super(message);
 	}

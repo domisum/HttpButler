@@ -4,7 +4,7 @@ import io.domisum.lib.auxiliumlib.annotations.API;
 import io.undertow.util.StatusCodes;
 
 @API
-public class NotFoundHttpException
+public class HttpBadGateway
 		extends HttpException
 {
 	
@@ -12,19 +12,19 @@ public class NotFoundHttpException
 	@Override
 	public int ERROR_CODE_INT()
 	{
-		return StatusCodes.NOT_FOUND;
+		return StatusCodes.BAD_GATEWAY;
 	}
 	
 	@Override
 	public String ERROR_CODE_STRING()
 	{
-		return StatusCodes.NOT_FOUND_STRING;
+		return StatusCodes.BAD_GATEWAY_STRING;
 	}
 	
 	
 	// INIT
 	@API
-	public NotFoundHttpException(String message)
+	public HttpBadGateway(String message)
 	{
 		super(message);
 	}

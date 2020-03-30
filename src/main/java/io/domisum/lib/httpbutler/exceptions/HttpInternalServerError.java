@@ -4,7 +4,7 @@ import io.domisum.lib.auxiliumlib.annotations.API;
 import io.undertow.util.StatusCodes;
 
 @API
-public class InternalServerErrorHttpException
+public class HttpInternalServerError
 		extends HttpException
 {
 	
@@ -24,7 +24,7 @@ public class InternalServerErrorHttpException
 	
 	// INIT
 	@API
-	public InternalServerErrorHttpException(String message)
+	public HttpInternalServerError(String message)
 	{
 		super(message);
 	}
