@@ -93,7 +93,7 @@ public class HttpButlerServer
 	private void validateCanChangeSettings()
 	{
 		if(server != null)
-			throw new IllegalStateException("can't change settings while server is running");
+			throw new IllegalStateException("Can't change settings while server is running");
 	}
 	
 	@API
@@ -152,8 +152,8 @@ public class HttpButlerServer
 		}
 		catch(RuntimeException e)
 		{
-			logger.error("an error occured while processing the request", e);
-			throw new HttpInternalServerError("an unexpected error occured while processing the request");
+			logger.error("An unexpected error occured while processing the request", e);
+			throw new HttpInternalServerError("An unexpected error occured while processing the request");
 		}
 	}
 	
@@ -166,7 +166,7 @@ public class HttpButlerServer
 		if(httpResponse == null)
 		{
 			logger.error("Endpoint {} returned null as response", endpoint);
-			throw new HttpInternalServerError("the endpoint did not return a response");
+			throw new HttpInternalServerError("The endpoint did not return a response");
 		}
 		
 		return httpResponse;
