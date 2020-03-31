@@ -20,8 +20,7 @@ public abstract class HttpException
 	// GETTERS
 	public String getResponseMessage()
 	{
-		String errorType = ERROR_CODE_INT()+" "+ERROR_CODE_STRING();
-		String response = errorType+": "+getMessage();
+		String response = ERROR_CODE_STRING()+": "+getMessage();
 		return response;
 	}
 	
