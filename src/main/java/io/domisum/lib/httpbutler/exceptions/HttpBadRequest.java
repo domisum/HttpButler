@@ -29,4 +29,10 @@ public class HttpBadRequest
 		super(message);
 	}
 	
+	@API
+	public HttpBadRequest(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+	
 }

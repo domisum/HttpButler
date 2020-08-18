@@ -29,4 +29,10 @@ public class HttpBadGateway
 		super(message);
 	}
 	
+	@API
+	public HttpBadGateway(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+	
 }

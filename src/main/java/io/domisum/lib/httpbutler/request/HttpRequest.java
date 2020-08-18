@@ -93,7 +93,7 @@ public class HttpRequest
 		String[] pathSplit = path.split(StringUtil.escapeStringForRegex("/"));
 		
 		if(segmentIndex >= pathSplit.length)
-			throw new HttpBadRequest("request did not contain path segment on index "+segmentIndex);
+			throw new HttpBadRequest("Request did not contain path segment on index "+segmentIndex);
 		
 		return pathSplit[segmentIndex];
 	}
@@ -109,7 +109,7 @@ public class HttpRequest
 		}
 		catch(RuntimeException e)
 		{
-			String error = PHR.r("invalid value for path segment at index {}, given: '{}', problem: {}", segmentIndex, pathSegmentString, e.getMessage());
+			String error = PHR.r("Invalid value for path segment at index {}, given: '{}', problem: {}", segmentIndex, pathSegmentString, e.getMessage());
 			throw new HttpBadRequest(error);
 		}
 	}
@@ -135,9 +135,9 @@ public class HttpRequest
 		var parameterValues = getQueryParameterValues(key);
 		
 		if(parameterValues.size() > 1)
-			throw new HttpBadRequest(PHR.r("request contained multiple values for paramenter '{}' but only one is expected", key));
+			throw new HttpBadRequest(PHR.r("Request contained multiple values for paramenter '{}' but only one is expected", key));
 		if(parameterValues.isEmpty())
-			throw new HttpBadRequest(PHR.r("expected value for parameter '{}' but none was provided", key));
+			throw new HttpBadRequest(PHR.r("Expected value for parameter '{}' but none was provided", key));
 		
 		return parameterValues.get(0);
 	}
@@ -153,7 +153,7 @@ public class HttpRequest
 		}
 		catch(RuntimeException e)
 		{
-			String error = PHR.r("invalid value for parameter '{}', given: '{}', problem: {}", key, parameterValueString, e.getMessage());
+			String error = PHR.r("Invalid value for parameter '{}', given: '{}', problem: {}", key, parameterValueString, e.getMessage());
 			throw new HttpBadRequest(error);
 		}
 	}
@@ -165,7 +165,7 @@ public class HttpRequest
 			throws HttpBadRequest
 	{
 		if(!headers.containsKey(key.toLowerCase()))
-			throw new HttpBadRequest(PHR.r("request is missing header with key '{}'", key));
+			throw new HttpBadRequest(PHR.r("Request is missing header with key '{}'", key));
 		
 		return headers.get(key.toLowerCase());
 	}
@@ -176,7 +176,7 @@ public class HttpRequest
 	{
 		var headerValues = getHeaderValues(key);
 		if(headerValues.size() > 1)
-			throw new HttpBadRequest(PHR.r("request contained multiple values for header '{}', must be one", key));
+			throw new HttpBadRequest(PHR.r("Request contained multiple values for header '{}', must be one", key));
 		
 		return Iterables.getOnlyElement(headerValues);
 	}

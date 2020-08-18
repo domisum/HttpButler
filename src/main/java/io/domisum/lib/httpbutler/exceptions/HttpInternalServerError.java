@@ -29,4 +29,10 @@ public class HttpInternalServerError
 		super(message);
 	}
 	
+	@API
+	public HttpInternalServerError(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+	
 }
