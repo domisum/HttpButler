@@ -5,14 +5,18 @@ import io.undertow.util.StatusCodes;
 
 @API
 public class HttpNotFound
-		extends HttpException
+	extends HttpException
 {
 	
 	// CONSTANTS
+	public static final int ERROR_CODE_INT = StatusCodes.NOT_FOUND;
+	
+	
+	// CONSTANT METHODS
 	@Override
 	public int ERROR_CODE_INT()
 	{
-		return StatusCodes.NOT_FOUND;
+		return ERROR_CODE_INT;
 	}
 	
 	@Override

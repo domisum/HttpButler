@@ -5,14 +5,18 @@ import io.undertow.util.StatusCodes;
 
 @API
 public class HttpServiceUnavailable
-		extends HttpException
+	extends HttpException
 {
 	
 	// CONSTANTS
+	public static final int ERROR_CODE_INT = StatusCodes.SERVICE_UNAVAILABLE;
+	
+	
+	// CONSTANT METHODS
 	@Override
 	public int ERROR_CODE_INT()
 	{
-		return StatusCodes.SERVICE_UNAVAILABLE;
+		return ERROR_CODE_INT;
 	}
 	
 	@Override
