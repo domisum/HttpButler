@@ -129,7 +129,7 @@ public class HttpButlerServer
 	
 	// EXCHANGE
 	private void handleExchange(HttpServerExchange exchange)
-			throws IOException
+		throws IOException
 	{
 		try(var request = buildHttpRequest(exchange))
 		{
@@ -144,7 +144,7 @@ public class HttpButlerServer
 	}
 	
 	private HttpResponse handleRequestCatchInternalErrors(HttpRequest request)
-			throws HttpException
+		throws HttpException
 	{
 		try
 		{
@@ -158,18 +158,27 @@ public class HttpButlerServer
 	}
 	
 	private HttpResponse handleRequest(HttpRequest request)
-			throws HttpException
+		throws HttpException
 	{
 		var endpoint = selectEndpoint(request);
 		logger.debug("Processing request {} in endpoint {}", request, endpoint);
-		var httpResponse = endpoint.handleRequest(request);
-		if(httpResponse == null)
+		try
 		{
-			logger.error("Endpoint {} returned null as response", endpoint);
-			throw new HttpInternalServerError("The endpoint did not return a response");
+			var httpResponse = endpoint.handleRequest(request);
+			if(httpResponse == null)
+			{
+				logger.error("Endpoint {} returned null as response", endpoint);
+				throw new HttpInternalServerError("The endpoint did not return a response");
+			}
+			
+			return httpResponse;
 		}
-		
-		return httpResponse;
+		catch(IOException e)
+		{
+			String message = "An IOException occurred while processing the request";
+			logger.error(message, e);
+			throw new HttpInternalServerError(message, e);
+		}
 	}
 	
 	
@@ -180,11 +189,11 @@ public class HttpButlerServer
 		String path = exchange.getRequestPath();
 		var body = exchange.getInputStream();
 		
-		var queryParameters = new HashMap<String,List<String>>();
+		var queryParameters = new HashMap<String, List<String>>();
 		for(var entry : exchange.getQueryParameters().entrySet())
 			queryParameters.put(entry.getKey(), List.copyOf(entry.getValue()));
 		
-		var headers = new HashMap<String,List<String>>();
+		var headers = new HashMap<String, List<String>>();
 		for(var headerValues : exchange.getRequestHeaders())
 			headers.put(headerValues.getHeaderName().toString(), List.copyOf(headerValues));
 		
@@ -192,9 +201,9 @@ public class HttpButlerServer
 	}
 	
 	private HttpButlerEndpoint selectEndpoint(HttpRequest request)
-			throws HttpNotFound, HttpInternalServerError
+		throws HttpNotFound, HttpInternalServerError
 	{
-		var endpointAcceptances = new HashMap<HttpButlerEndpoint,Double>();
+		var endpointAcceptances = new HashMap<HttpButlerEndpoint, Double>();
 		for(var endpoint : endpoints)
 		{
 			double acceptance = endpoint.getAcceptance(request);
@@ -208,17 +217,17 @@ public class HttpButlerServer
 		
 		// endpoints tied
 		double maxAcceptance = endpointAcceptances.values().stream()
-				.max(Double::compareTo)
-				.orElseThrow();
+			.max(Double::compareTo)
+			.orElseThrow();
 		var endpointsWithMaxAcceptance = endpointAcceptances.entrySet().stream()
-				.filter(e->e.getValue() == maxAcceptance)
-				.map(Entry::getKey)
-				.collect(Collectors.toSet());
+			.filter(e->e.getValue() == maxAcceptance)
+			.map(Entry::getKey)
+			.collect(Collectors.toSet());
 		if(endpointsWithMaxAcceptance.size() > 1)
 		{
 			var tiedEndpointNames = endpointsWithMaxAcceptance.stream()
-					.map(e->e.getClass().getSimpleName())
-					.collect(Collectors.toSet());
+				.map(e->e.getClass().getSimpleName())
+				.collect(Collectors.toSet());
 			String tieDisplayString = StringUtil.collectionToString(tiedEndpointNames, ",")+" (acceptance: "+maxAcceptance+")";
 			
 			logger.error("Multiple endpoints tied for handling request: {}; request:\n{}", tieDisplayString, request);

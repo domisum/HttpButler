@@ -4,6 +4,8 @@ import io.domisum.lib.auxiliumlib.annotations.API;
 import io.domisum.lib.httpbutler.exceptions.HttpException;
 import io.domisum.lib.httpbutler.request.HttpRequest;
 
+import java.io.IOException;
+
 public abstract class HttpButlerEndpoint
 {
 	
@@ -16,6 +18,6 @@ public abstract class HttpButlerEndpoint
 	
 	@API
 	protected abstract HttpResponse handleRequest(HttpRequest request)
-			throws HttpException;
+		throws IOException, HttpException;
 	
 }
