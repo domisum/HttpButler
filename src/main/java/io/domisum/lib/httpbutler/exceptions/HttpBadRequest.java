@@ -5,7 +5,7 @@ import io.undertow.util.StatusCodes;
 
 @API
 public class HttpBadRequest
-		extends HttpException
+	extends HttpException
 {
 	
 	// CONSTANTS

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @API
 @NoArgsConstructor
 public class HttpResponseNoBody
-		extends HttpResponse
+	extends HttpResponse
 {
 	
 	// SEND

@@ -5,7 +5,7 @@ import io.undertow.util.StatusCodes;
 
 @API
 public class HttpForbidden
-		extends HttpException
+	extends HttpException
 {
 	
 	// CONSTANTS

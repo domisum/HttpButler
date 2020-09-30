@@ -3,7 +3,7 @@ package io.domisum.lib.httpbutler.exceptions;
 import io.domisum.lib.auxiliumlib.util.ExceptionUtil;
 
 public abstract class HttpException
-		extends Exception
+	extends Exception
 {
 	
 	// CONSTANTS
@@ -29,8 +29,8 @@ public abstract class HttpException
 	{
 		String response = ERROR_CODE_STRING()+": "+getMessage();
 		if(getCause() != null)
-			response +="\n"+ExceptionUtil.convertToString(getCause());
-			
+			response += "\n"+ExceptionUtil.convertToString(getCause());
+		
 		return response;
 	}
 	

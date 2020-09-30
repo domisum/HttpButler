@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class HttpResponseString
-		extends HttpResponse
+	extends HttpResponse
 {
 	
 	// ATTRIBUTES

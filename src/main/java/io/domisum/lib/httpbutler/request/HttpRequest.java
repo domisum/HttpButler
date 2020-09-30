@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class HttpRequest
-		implements AutoCloseable
+	implements AutoCloseable
 {
 	
 	@Getter
@@ -27,8 +27,8 @@ public class HttpRequest
 	@Getter
 	private final String path; // no slash at end or beginning
 	
-	private final Map<String,List<String>> queryParameters; // keys lowercase
-	private final Map<String,List<String>> headers; // keys lowercase
+	private final Map<String, List<String>> queryParameters; // keys lowercase
+	private final Map<String, List<String>> headers; // keys lowercase
 	
 	@Getter
 	private final InputStream body;
@@ -36,17 +36,17 @@ public class HttpRequest
 	
 	// INIT
 	public HttpRequest(HttpMethod method, String path,
-			Map<String,List<String>> queryParameters, Map<String,List<String>> headers, InputStream body)
+		Map<String, List<String>> queryParameters, Map<String, List<String>> headers, InputStream body)
 	{
 		this.method = method;
 		this.path = cleanUpPath(path);
 		
-		var queryParametersCleaned = new HashMap<String,List<String>>();
+		var queryParametersCleaned = new HashMap<String, List<String>>();
 		for(var entry : queryParameters.entrySet())
 			queryParametersCleaned.put(entry.getKey().toLowerCase(), List.copyOf(entry.getValue()));
 		this.queryParameters = Collections.unmodifiableMap(queryParametersCleaned);
 		
-		var headersCleaned = new HashMap<String,List<String>>();
+		var headersCleaned = new HashMap<String, List<String>>();
 		for(var entry : headers.entrySet())
 			headersCleaned.put(entry.getKey().toLowerCase(), List.copyOf(entry.getValue()));
 		this.headers = Collections.unmodifiableMap(headersCleaned);
@@ -88,7 +88,7 @@ public class HttpRequest
 	// PATH
 	@API
 	public String getPathSegment(int segmentIndex)
-			throws HttpBadRequest
+		throws HttpBadRequest
 	{
 		String[] pathSplit = path.split(StringUtil.escapeStringForRegex("/"));
 		
@@ -99,8 +99,8 @@ public class HttpRequest
 	}
 	
 	@API
-	public <T> T parsePathSegment(int segmentIndex, Function<String,T> parser)
-			throws HttpBadRequest
+	public <T> T parsePathSegment(int segmentIndex, Function<String, T> parser)
+		throws HttpBadRequest
 	{
 		String pathSegmentString = getPathSegment(segmentIndex);
 		try
@@ -129,7 +129,7 @@ public class HttpRequest
 	
 	@API
 	public String getQueryParameterValue(String key)
-			throws HttpBadRequest
+		throws HttpBadRequest
 	{
 		key = key.toLowerCase();
 		var parameterValues = getQueryParameterValues(key);
@@ -143,8 +143,8 @@ public class HttpRequest
 	}
 	
 	@API
-	public <T> T parseQueryParameterValue(String key, Function<String,T> parser)
-			throws HttpBadRequest
+	public <T> T parseQueryParameterValue(String key, Function<String, T> parser)
+		throws HttpBadRequest
 	{
 		String parameterValueString = getQueryParameterValue(key);
 		try
@@ -162,7 +162,7 @@ public class HttpRequest
 	// HEADERS
 	@API
 	public List<String> getHeaderValues(String key)
-			throws HttpBadRequest
+		throws HttpBadRequest
 	{
 		if(!headers.containsKey(key.toLowerCase()))
 			throw new HttpBadRequest(PHR.r("Request is missing header with key '{}'", key));
@@ -172,7 +172,7 @@ public class HttpRequest
 	
 	@API
 	public String getHeaderValue(String key)
-			throws HttpBadRequest
+		throws HttpBadRequest
 	{
 		var headerValues = getHeaderValues(key);
 		if(headerValues.size() > 1)
@@ -185,14 +185,14 @@ public class HttpRequest
 	// BODY
 	@API
 	public String getBodyAsString()
-			throws IOException
+		throws IOException
 	{
 		return IOUtils.toString(body, StandardCharsets.UTF_8);
 	}
 	
 	@Override
 	public void close()
-			throws IOException
+		throws IOException
 	{
 		body.close();
 	}

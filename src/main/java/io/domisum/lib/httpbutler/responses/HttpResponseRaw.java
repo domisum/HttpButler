@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 @API
 @RequiredArgsConstructor
 public class HttpResponseRaw
-		extends HttpResponse
+	extends HttpResponse
 {
 	
 	// ATTRIBUTES

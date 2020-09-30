@@ -8,7 +8,7 @@ import io.domisum.lib.httpbutler.request.HttpRequest;
 
 @API
 public abstract class HttpButlerEndpointTypeArgsInPath
-		extends HttpButlerEndpoint
+	extends HttpButlerEndpoint
 {
 	
 	// CONSTANTS

@@ -7,7 +7,7 @@ import io.domisum.lib.httpbutler.request.HttpRequest;
 
 @API
 public abstract class HttpButlerEndpointTypeStaticPath
-		extends HttpButlerEndpoint
+	extends HttpButlerEndpoint
 {
 	
 	// CONSTANT METHODS
