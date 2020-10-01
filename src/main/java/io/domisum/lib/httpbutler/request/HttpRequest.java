@@ -190,6 +190,13 @@ public class HttpRequest
 		return IOUtils.toString(body, StandardCharsets.UTF_8);
 	}
 	
+	@API
+	public byte[] getBodyRaw()
+		throws IOException
+	{
+		return IOUtils.toByteArray(body);
+	}
+	
 	@Override
 	public void close()
 		throws IOException
