@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +43,12 @@ public class HttpRequest
 		var queryParametersCleaned = new HashMap<String, List<String>>();
 		for(var entry : queryParameters.entrySet())
 			queryParametersCleaned.put(entry.getKey().toLowerCase(), List.copyOf(entry.getValue()));
-		this.queryParameters = Collections.unmodifiableMap(queryParametersCleaned);
+		this.queryParameters = Map.copyOf(queryParametersCleaned);
 		
 		var headersCleaned = new HashMap<String, List<String>>();
 		for(var entry : headers.entrySet())
 			headersCleaned.put(entry.getKey().toLowerCase(), List.copyOf(entry.getValue()));
-		this.headers = Collections.unmodifiableMap(headersCleaned);
+		this.headers = Map.copyOf(headersCleaned);
 		
 		this.body = body;
 	}
