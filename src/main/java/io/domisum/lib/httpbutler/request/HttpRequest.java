@@ -3,6 +3,7 @@ package io.domisum.lib.httpbutler.request;
 import com.google.common.collect.Iterables;
 import io.domisum.lib.auxiliumlib.PHR;
 import io.domisum.lib.auxiliumlib.annotations.API;
+import io.domisum.lib.auxiliumlib.util.StringListUtil;
 import io.domisum.lib.auxiliumlib.util.StringUtil;
 import io.domisum.lib.httpbutler.exceptions.HttpBadRequest;
 import lombok.Getter;
@@ -80,7 +81,7 @@ public class HttpRequest
 		
 		lines.add("Body: (omitted)");
 		
-		return StringUtil.listToString(lines, "\n");
+		return StringListUtil.listHorizontally(lines, "\n");
 	}
 	
 	

@@ -2,7 +2,7 @@ package io.domisum.lib.httpbutler;
 
 import com.google.common.collect.Iterables;
 import io.domisum.lib.auxiliumlib.annotations.API;
-import io.domisum.lib.auxiliumlib.util.StringUtil;
+import io.domisum.lib.auxiliumlib.util.StringListUtil;
 import io.domisum.lib.httpbutler.exceptions.HttpException;
 import io.domisum.lib.httpbutler.exceptions.HttpInternalServerError;
 import io.domisum.lib.httpbutler.exceptions.HttpNotFound;
@@ -228,7 +228,7 @@ public class HttpButlerServer
 			var tiedEndpointNames = endpointsWithMaxAcceptance.stream()
 				.map(e->e.getClass().getSimpleName())
 				.collect(Collectors.toSet());
-			String tieDisplayString = StringUtil.collectionToString(tiedEndpointNames, ",")+" (acceptance: "+maxAcceptance+")";
+			String tieDisplayString = StringListUtil.listHorizontally(tiedEndpointNames)+" (acceptance: "+maxAcceptance+")";
 			
 			logger.error("Multiple endpoints tied for handling request: {}; request:\n{}", tieDisplayString, request);
 			throw new HttpInternalServerError("Multiple endpoints tied for handling this request: "+tieDisplayString);
