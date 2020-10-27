@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class HttpRequest
@@ -143,6 +144,19 @@ public class HttpRequest
 	}
 	
 	@API
+	public Optional<String> getQueryParameterValueOptional(String key)
+	{
+		key = key.toLowerCase();
+		var parameterValues = getQueryParameterValues(key);
+		
+		if(parameterValues.size() != 1)
+			return Optional.empty();
+		
+		String parameterValue = parameterValues.get(0);
+		return Optional.of(parameterValue);
+	}
+	
+	@API
 	public <T> T parseQueryParameterValue(String key, Function<String, T> parser)
 		throws HttpBadRequest
 	{
@@ -154,6 +168,26 @@ public class HttpRequest
 		catch(RuntimeException e)
 		{
 			String error = PHR.r("Invalid value for parameter '{}', given: '{}', problem: {}", key, parameterValueString, e.getMessage());
+			throw new HttpBadRequest(error);
+		}
+	}
+	
+	@API
+	public <T> T parseQueryParameterValueOrDefault(String key, T defaultValue, Function<String, T> parser)
+		throws HttpBadRequest
+	{
+		var parameterValueOptional = getQueryParameterValueOptional(key);
+		if(parameterValueOptional.isEmpty())
+			return defaultValue;
+		String parameterValueString = parameterValueOptional.get();
+		
+		try
+		{
+			return parser.apply(parameterValueString);
+		}
+		catch(RuntimeException e)
+		{
+			String error = PHR.r("Invalid value for parameter '{}', given: '{}', problem: {}", key, parameterValueOptional, e.getMessage());
 			throw new HttpBadRequest(error);
 		}
 	}
