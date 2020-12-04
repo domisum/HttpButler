@@ -15,14 +15,22 @@ public class HttpResponseRaw
 {
 	
 	// ATTRIBUTES
+	private final String contentType;
 	private final byte[] content;
+	
+	
+	// INIT
+	public HttpResponseRaw(byte[] content)
+	{
+		this("application/octet-stream", content);
+	}
 	
 	
 	// SEND
 	@Override
 	protected void sendSpecific(HttpServerExchange httpServerExchange)
 	{
-		httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/octet-stream");
+		httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType);
 		httpServerExchange.getResponseSender().send(ByteBuffer.wrap(content));
 	}
 	
