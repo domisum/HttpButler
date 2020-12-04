@@ -1,29 +1,38 @@
 package io.domisum.lib.httpbutler.responses;
 
 import io.domisum.lib.auxiliumlib.annotations.API;
+import io.domisum.lib.auxiliumlib.util.ValidationUtil;
 import io.domisum.lib.httpbutler.HttpResponse;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import lombok.RequiredArgsConstructor;
 
-import java.nio.ByteBuffer;
+import java.io.IOException;
+import java.io.InputStream;
 
 @API
-@RequiredArgsConstructor
-public class HttpResponseRaw
+public class HttpResponseStream
 	extends HttpResponse
 {
 	
 	// ATTRIBUTES
-	private final byte[] content;
+	private final InputStream stream;
+	
+	
+	// INIT
+	public HttpResponseStream(InputStream stream)
+	{
+		ValidationUtil.notNull(stream, "stream");
+		this.stream = stream;
+	}
 	
 	
 	// SEND
 	@Override
 	protected void sendSpecific(HttpServerExchange httpServerExchange)
+		throws IOException
 	{
 		httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/octet-stream");
-		httpServerExchange.getResponseSender().send(ByteBuffer.wrap(content));
+		stream.transferTo(httpServerExchange.getOutputStream());
 	}
 	
 }

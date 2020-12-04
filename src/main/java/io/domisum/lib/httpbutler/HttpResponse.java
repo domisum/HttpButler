@@ -5,6 +5,7 @@ import io.domisum.lib.auxiliumlib.datacontainers.tuple.Duo;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public abstract class HttpResponse
 	
 	// SENDING
 	protected final void send(HttpServerExchange httpServerExchange)
+		throws IOException
 	{
 		for(var header : headers)
 			httpServerExchange.getResponseHeaders().put(new HttpString(header.getA()), header.getB());
@@ -32,6 +34,7 @@ public abstract class HttpResponse
 		sendSpecific(httpServerExchange);
 	}
 	
-	protected abstract void sendSpecific(HttpServerExchange httpServerExchange);
+	protected abstract void sendSpecific(HttpServerExchange httpServerExchange)
+		throws IOException;
 	
 }
