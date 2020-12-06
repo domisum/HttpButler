@@ -228,7 +228,7 @@ public class HttpButlerServer
 			var tiedEndpointNames = endpointsWithMaxAcceptance.stream()
 				.map(e->e.getClass().getSimpleName())
 				.collect(Collectors.toSet());
-			String tieDisplayString = StringListUtil.listHorizontally(tiedEndpointNames)+" (acceptance: "+maxAcceptance+")";
+			String tieDisplayString = StringListUtil.list(tiedEndpointNames)+" (acceptance: "+maxAcceptance+")";
 			
 			logger.error("Multiple endpoints tied for handling request: {}; request:\n{}", tieDisplayString, request);
 			throw new HttpInternalServerError("Multiple endpoints tied for handling this request: "+tieDisplayString);

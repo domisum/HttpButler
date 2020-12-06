@@ -82,7 +82,7 @@ public class HttpRequest
 		
 		lines.add("Body: (omitted)");
 		
-		return StringListUtil.listHorizontally(lines, "\n");
+		return StringListUtil.list(lines, "\n");
 	}
 	
 	
