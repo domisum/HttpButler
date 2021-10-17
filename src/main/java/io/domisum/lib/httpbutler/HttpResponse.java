@@ -1,5 +1,6 @@
 package io.domisum.lib.httpbutler;
 
+import io.domisum.lib.auxiliumlib.PHR;
 import io.domisum.lib.auxiliumlib.annotations.API;
 import io.domisum.lib.auxiliumlib.datacontainers.tuple.Duo;
 import io.undertow.server.HttpServerExchange;
@@ -21,6 +22,14 @@ public abstract class HttpResponse
 	public void addHeader(String key, String value)
 	{
 		headers.add(new Duo<>(key, value));
+	}
+	
+	@API
+	public void addDownloadFileName(String fileName)
+	{
+		final String headerKey = "Content-Disposition";
+		String headerValue = PHR.r("attachment; filename=\"{}\"", fileName);
+		headers.add(new Duo<>(headerKey, headerValue));
 	}
 	
 	
