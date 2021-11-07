@@ -138,6 +138,9 @@ public class HttpButlerServer
 		}
 		catch(HttpException e)
 		{
+			if(exchange.isResponseStarted())
+				return;
+			
 			exchange.setStatusCode(e.ERROR_CODE());
 			exchange.getResponseSender().send(e.getResponseMessage());
 		}
