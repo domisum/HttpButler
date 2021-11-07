@@ -10,13 +10,13 @@ public class HttpForbidden
 	
 	// CONSTANTS
 	@Override
-	public int ERROR_CODE_INT()
+	public int ERROR_CODE()
 	{
 		return StatusCodes.FORBIDDEN;
 	}
 	
 	@Override
-	public String ERROR_CODE_STRING()
+	public String ERROR_MESSAGE()
 	{
 		return StatusCodes.FORBIDDEN_STRING;
 	}

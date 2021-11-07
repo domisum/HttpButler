@@ -14,13 +14,13 @@ public class HttpNotFound
 	
 	// CONSTANT METHODS
 	@Override
-	public int ERROR_CODE_INT()
+	public int ERROR_CODE()
 	{
 		return ERROR_CODE_INT;
 	}
 	
 	@Override
-	public String ERROR_CODE_STRING()
+	public String ERROR_MESSAGE()
 	{
 		return StatusCodes.NOT_FOUND_STRING;
 	}

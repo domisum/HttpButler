@@ -7,9 +7,9 @@ public abstract class HttpException
 {
 	
 	// CONSTANTS
-	public abstract int ERROR_CODE_INT();
+	public abstract int ERROR_CODE();
 	
-	public abstract String ERROR_CODE_STRING();
+	public abstract String ERROR_MESSAGE();
 	
 	
 	// INIT
@@ -27,7 +27,7 @@ public abstract class HttpException
 	// GETTERS
 	public String getResponseMessage()
 	{
-		String response = ERROR_CODE_STRING()+": "+getMessage();
+		String response = ERROR_MESSAGE()+": "+getMessage();
 		if(getCause() != null)
 			response += "\n"+ExceptionUtil.convertToString(getCause());
 		

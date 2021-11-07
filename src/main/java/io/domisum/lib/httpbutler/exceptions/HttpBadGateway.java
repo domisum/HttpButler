@@ -10,13 +10,13 @@ public class HttpBadGateway
 	
 	// CONSTANTS
 	@Override
-	public int ERROR_CODE_INT()
+	public int ERROR_CODE()
 	{
 		return StatusCodes.BAD_GATEWAY;
 	}
 	
 	@Override
-	public String ERROR_CODE_STRING()
+	public String ERROR_MESSAGE()
 	{
 		return StatusCodes.BAD_GATEWAY_STRING;
 	}

@@ -138,7 +138,7 @@ public class HttpButlerServer
 		}
 		catch(HttpException e)
 		{
-			exchange.setStatusCode(e.ERROR_CODE_INT());
+			exchange.setStatusCode(e.ERROR_CODE());
 			exchange.getResponseSender().send(e.getResponseMessage());
 		}
 	}
