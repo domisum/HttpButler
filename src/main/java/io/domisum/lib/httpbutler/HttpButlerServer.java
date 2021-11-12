@@ -2,6 +2,8 @@ package io.domisum.lib.httpbutler;
 
 import com.google.common.collect.Iterables;
 import io.domisum.lib.auxiliumlib.annotations.API;
+import io.domisum.lib.auxiliumlib.display.DurationDisplay;
+import io.domisum.lib.auxiliumlib.util.Compare;
 import io.domisum.lib.auxiliumlib.util.StringListUtil;
 import io.domisum.lib.httpbutler.exceptions.HttpException;
 import io.domisum.lib.httpbutler.exceptions.HttpInternalServerError;
@@ -14,7 +16,10 @@ import io.undertow.server.handlers.BlockingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +41,8 @@ public class HttpButlerServer
 	
 	private int numberOfIoThreads = Runtime.getRuntime().availableProcessors();
 	private int numberOfWorkerThreads = Runtime.getRuntime().availableProcessors();
+	@Nullable
+	private Duration warnOnHandleLongerThan = Duration.ofSeconds(10);
 	
 	// ENDPOINTS
 	private final Set<HttpButlerEndpoint> endpoints = new HashSet<>();
@@ -110,6 +117,13 @@ public class HttpButlerServer
 		this.numberOfWorkerThreads = numberOfWorkerThreads;
 	}
 	
+	@API
+	public synchronized void setWarnOnHandleLongerThan(Duration warnOnHandleLongerThan)
+	{
+		validateCanChangeSettings();
+		this.warnOnHandleLongerThan = warnOnHandleLongerThan;
+	}
+	
 	
 	// ENDPOINTS
 	@API
@@ -167,7 +181,7 @@ public class HttpButlerServer
 		logger.debug("Processing request {} in endpoint {}", request, endpoint);
 		try
 		{
-			var httpResponse = endpoint.handleRequest(request);
+			var httpResponse = handleRequest(request, endpoint);
 			if(httpResponse == null)
 			{
 				logger.error("Endpoint {} returned null as response", endpoint);
@@ -182,6 +196,26 @@ public class HttpButlerServer
 			logger.error(message, e);
 			throw new HttpInternalServerError(message, e);
 		}
+	}
+	
+	private HttpResponse handleRequest(HttpRequest request, HttpButlerEndpoint endpoint)
+		throws IOException, HttpException
+	{
+		var startInstant = Instant.now();
+		var httpResponse = endpoint.handleRequest(request);
+		var endInstant = Instant.now();
+		
+		if(warnOnHandleLongerThan != null)
+		{
+			var handleDuration = Duration.between(startInstant, endInstant);
+			if(Compare.greaterThan(handleDuration, warnOnHandleLongerThan))
+			{
+				String endpointName = endpoint.getClass().getSimpleName();
+				logger.warn("Handle took too long: {} ({})", DurationDisplay.of(handleDuration), endpointName);
+			}
+		}
+		
+		return httpResponse;
 	}
 	
 	
