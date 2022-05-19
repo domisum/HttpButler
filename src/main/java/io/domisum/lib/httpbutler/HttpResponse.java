@@ -25,10 +25,21 @@ public abstract class HttpResponse
 	}
 	
 	@API
-	public void addDownloadFileName(String fileName)
+	public void asDownload(String fileName)
+	{
+		setContentDisposition("attachment", fileName);
+	}
+	
+	@API
+	public void displayInline(String fileName)
+	{
+		setContentDisposition("inline", fileName);
+	}
+	
+	private void setContentDisposition(String contentDispositionType, String fileName)
 	{
 		final String headerKey = "Content-Disposition";
-		String headerValue = PHR.r("attachment; filename=\"{}\"", fileName);
+		String headerValue = PHR.r("{}; filename=\"{}\"", contentDispositionType, fileName);
 		headers.add(new Duo<>(headerKey, headerValue));
 	}
 	
