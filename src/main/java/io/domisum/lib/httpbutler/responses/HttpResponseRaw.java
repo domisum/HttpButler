@@ -25,6 +25,16 @@ public class HttpResponseRaw
 		this("application/octet-stream", content);
 	}
 	
+	public static HttpResponseRaw pdf(byte[] rawPdf)
+	{
+		return new HttpResponseRaw("application/pdf", rawPdf);
+	}
+	
+	public static HttpResponseRaw png(byte[] rawPng)
+	{
+		return new HttpResponseRaw("image/png", rawPng);
+	}
+	
 	
 	// SEND
 	@Override
