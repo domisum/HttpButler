@@ -2,25 +2,25 @@ package io.domisum.lib.httpbutler.responses;
 
 import io.domisum.lib.auxiliumlib.annotations.API;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.HttpString;
 import io.undertow.util.StatusCodes;
+import lombok.RequiredArgsConstructor;
 
 @API
+@RequiredArgsConstructor
 public class HttpResponseRedirect
-	extends HttpResponseString
+	extends HttpResponseNoBody
 {
 	
-	// INIT
-	@API
-	public HttpResponseRedirect(String url)
-	{
-		super("text/plain", "Location: "+url);
-	}
+	private final String url;
 	
+	
+	// INIT
 	@Override
 	protected void sendSpecific(HttpServerExchange httpServerExchange)
 	{
 		httpServerExchange.setStatusCode(StatusCodes.FOUND);
-		super.sendSpecific(httpServerExchange);
+		httpServerExchange.getResponseHeaders().add(new HttpString("Location"), url);
 	}
 	
 }
