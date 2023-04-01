@@ -6,7 +6,7 @@ import io.undertow.util.Headers;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public abstract class HttpResponseString
+public class HttpResponseString
 	extends HttpResponse
 {
 	
