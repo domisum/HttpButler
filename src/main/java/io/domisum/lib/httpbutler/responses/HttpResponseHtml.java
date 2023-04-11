@@ -15,10 +15,10 @@ public class HttpResponseHtml
 	}
 	
 	
-	public static HttpResponseHtml build(String title, String body, String bodyStyle)
+	public static HttpResponseHtml build(String title, String style, String body)
 	{
-		String html = PHR.r("<html><head><title>{}</title></head><body style=\"{}\">{}</body></html>",
-			title, body, bodyStyle);
+		String head = PHR.r("<head><title>{}</title><style>{}</style></head>", title, style);
+		String html = PHR.r("<html>{}<body>{}</body></html>", head, body);
 		return new HttpResponseHtml(html);
 	}
 	
