@@ -11,7 +11,7 @@ public class HttpResponsePlaintext
 	@API
 	public HttpResponsePlaintext(String plaintext)
 	{
-		super("text/plain", plaintext);
+		super("text/plain; charset=utf-8", plaintext);
 	}
 	
 }
