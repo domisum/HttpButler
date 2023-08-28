@@ -1,5 +1,6 @@
 package io.domisum.lib.httpbutler.responses;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.domisum.lib.auxiliumlib.PHR;
 import io.domisum.lib.auxiliumlib.annotations.API;
 
@@ -17,9 +18,15 @@ public class HttpResponseHtml
 	
 	public static HttpResponseHtml build(String title, String style, String body)
 	{
-		String head = PHR.r("<head><title>{}</title><style>{}</style></head>", title, style);
-		String html = PHR.r("<html>{}<body>{}</body></html>", head, body);
+		String html = buildHtml(title, style, body);
 		return new HttpResponseHtml(html);
+	}
+	
+	@VisibleForTesting
+	public static String buildHtml(String title, String style, String body)
+	{
+		String head = PHR.r("<head><title>{}</title><style>{}</style></head>", title, style);
+		return PHR.r("<html>{}<body>{}</body></html>", head, body);
 	}
 	
 }
