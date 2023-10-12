@@ -42,7 +42,7 @@ public class HttpButlerServer
 	private int numberOfIoThreads = Runtime.getRuntime().availableProcessors();
 	private int numberOfWorkerThreads = Runtime.getRuntime().availableProcessors();
 	@Nullable
-	private Duration warnOnHandleLongerThan = Duration.ofSeconds(10);
+	private Duration warnOnHandleLongerThan = Duration.ofSeconds(30);
 	
 	// ENDPOINTS
 	private final Set<HttpButlerEndpoint> endpoints = new HashSet<>();
