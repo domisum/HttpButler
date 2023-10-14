@@ -73,7 +73,7 @@ public class HttpButlerServer
 	{
 		if(server != null)
 			return;
-		logger.info("Starting {} on {}:{}...", getClass().getSimpleName(), host, port);
+		logger.info("Starting HttpButlerServer on {}:{}", host, port);
 		
 		var serverBuilder = Undertow.builder();
 		serverBuilder.addHttpListener(port, host, new BlockingHandler(this::handleExchange));
@@ -90,7 +90,7 @@ public class HttpButlerServer
 		if(server == null)
 			return;
 		
-		logger.info("Stopping {}...", getClass().getSimpleName());
+		logger.info("Stopping HttpButlerServer");
 		server.stop();
 		server = null;
 	}
