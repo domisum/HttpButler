@@ -91,12 +91,12 @@ public class HttpRequest
 	public String getPathSegment(int segmentIndex)
 		throws HttpBadRequest
 	{
-		String[] pathSplit = path.split(StringUtil.escapeStringForRegex("/"));
+		var pathSplit = StringUtil.splitByLiteral(path, "/");
 		
-		if(segmentIndex >= pathSplit.length)
+		if(segmentIndex >= pathSplit.size())
 			throw new HttpBadRequest("Request did not contain path segment on index "+segmentIndex);
 		
-		return pathSplit[segmentIndex];
+		return pathSplit.get(segmentIndex);
 	}
 	
 	@API
