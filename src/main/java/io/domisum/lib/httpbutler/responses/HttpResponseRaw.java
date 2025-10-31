@@ -20,21 +20,25 @@ public class HttpResponseRaw
 	
 	
 	// INIT
+	@API
 	public HttpResponseRaw(byte[] content)
 	{
 		this("application/octet-stream", content);
 	}
 	
+	@API
 	public static HttpResponseRaw pdf(byte[] rawPdf)
 	{
 		return new HttpResponseRaw("application/pdf", rawPdf);
 	}
 	
+	@API
 	public static HttpResponseRaw png(byte[] rawPng)
 	{
 		return new HttpResponseRaw("image/png", rawPng);
 	}
 	
+	@API
 	public static HttpResponseRaw jpg(byte[] rawJpg)
 	{
 		return new HttpResponseRaw("image/jpeg", rawJpg);
