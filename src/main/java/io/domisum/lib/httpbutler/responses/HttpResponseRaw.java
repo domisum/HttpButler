@@ -35,6 +35,11 @@ public class HttpResponseRaw
 		return new HttpResponseRaw("image/png", rawPng);
 	}
 	
+	public static HttpResponseRaw jpg(byte[] rawJpg)
+	{
+		return new HttpResponseRaw("image/jpeg", rawJpg);
+	}
+	
 	
 	// SEND
 	@Override
