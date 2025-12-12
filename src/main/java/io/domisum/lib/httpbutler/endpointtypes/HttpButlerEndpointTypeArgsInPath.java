@@ -50,7 +50,7 @@ public abstract class HttpButlerEndpointTypeArgsInPath
 	protected String arg(int index, HttpRequest request)
 		throws HttpBadRequest
 	{
-		var segments = StringUtil.splitByLiteral(PATH_WITH_PLACEHOLDERS(), "/");
+		var segments = StringUtil.splitByLiteral(HttpRequest.cleanUpPath(PATH_WITH_PLACEHOLDERS()), "/");
 		int phi = 0;
 		for(int i = 0; i < segments.size(); i++)
 			if(segments.get(i).equals(PLACEHOLDER))
