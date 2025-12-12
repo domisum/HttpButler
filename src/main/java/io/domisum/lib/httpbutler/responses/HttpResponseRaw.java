@@ -32,18 +32,6 @@ public class HttpResponseRaw
 		return new HttpResponseRaw("application/pdf", rawPdf);
 	}
 	
-	@API
-	public static HttpResponseRaw png(byte[] rawPng)
-	{
-		return new HttpResponseRaw("image/png", rawPng);
-	}
-	
-	@API
-	public static HttpResponseRaw jpg(byte[] rawJpg)
-	{
-		return new HttpResponseRaw("image/jpeg", rawJpg);
-	}
-	
 	
 	// SEND
 	@Override
