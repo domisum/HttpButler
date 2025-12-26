@@ -17,34 +17,21 @@ public abstract class HttpResponse
 	private final List<Duo<String>> headers = new ArrayList<>();
 	
 	
-	// GENERAL RESPONSE
+	// INTERFACE
 	@API
-	public void addHeader(String key, String value)
-	{
-		headers.add(new Duo<>(key, value));
-	}
+	public void addHeader(String key, String value) {headers.add(new Duo<>(key, value));}
 	
 	@API
-	public void asDownload(String fileName)
-	{
-		setContentDisposition("attachment", fileName);
-	}
+	public void asDownload(String fileName) {setContentDisposition("attachment", fileName);}
 	
 	@API
-	public void displayInline(String fileName)
-	{
-		setContentDisposition("inline", fileName);
-	}
+	public void displayInline(String fileName) {setContentDisposition("inline", fileName);}
 	
-	private void setContentDisposition(String contentDispositionType, String fileName)
-	{
-		final String headerKey = "Content-Disposition";
-		String headerValue = PHR.r("{}; filename=\"{}\"", contentDispositionType, fileName);
-		headers.add(new Duo<>(headerKey, headerValue));
-	}
+	@API
+	public void cacheImmutable() {setCacheControl("public,max-age=31536000,immutable");}
 	
 	
-	// SENDING
+	// INTERNAL INTERFACE
 	protected final void send(HttpServerExchange httpServerExchange)
 		throws IOException
 	{
@@ -56,5 +43,23 @@ public abstract class HttpResponse
 	
 	protected abstract void sendSpecific(HttpServerExchange httpServerExchange)
 		throws IOException;
+	
+	
+	// INTERNAL
+	private void setContentDisposition(String contentDispositionType, String fileName)
+	{
+		final String key = "content-disposition";
+		clearHeader(key);
+		addHeader(key, PHR.r("{}; filename=\"{}\"", contentDispositionType, fileName));
+	}
+	
+	private void setCacheControl(String value)
+	{
+		final String key = "cache-control";
+		clearHeader(key);
+		addHeader(key, value);
+	}
+	
+	private void clearHeader(String key) {headers.removeIf(d -> d.getA().equalsIgnoreCase(key));}
 	
 }
