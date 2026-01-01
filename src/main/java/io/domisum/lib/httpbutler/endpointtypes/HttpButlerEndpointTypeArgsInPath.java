@@ -8,6 +8,8 @@ import io.domisum.lib.httpbutler.exceptions.HttpBadRequest;
 import io.domisum.lib.httpbutler.request.HttpMethod;
 import io.domisum.lib.httpbutler.request.HttpRequest;
 
+import java.util.function.Function;
+
 @API
 public abstract class HttpButlerEndpointTypeArgsInPath
 	extends HttpButlerEndpoint
@@ -47,6 +49,10 @@ public abstract class HttpButlerEndpointTypeArgsInPath
 	
 	
 	// UTIL
+	protected <T> T parseArg(int index, Function<String, T> parse, HttpRequest request)
+		throws HttpBadRequest
+	{return parse.apply(arg(index, request));}
+	
 	protected String arg(int index, HttpRequest request)
 		throws HttpBadRequest
 	{
