@@ -70,19 +70,20 @@ public class HttpButlerEndpointTypeArgsInPathTest
 	
 	private HttpRequest createRequest(String path)
 	{
-		return new HttpRequest(HttpMethod.GET, path, new HashMap<>(), new HashMap<>(), new ByteArrayInputStream(new byte[] {}));
+		return new HttpRequest(HttpMethod.GET, path, new HashMap<>(), new HashMap<>(),
+			new ByteArrayInputStream(new byte[]{}), null);
 	}
 	
 	
 	// ASSERT
 	private void assertDoesAccept(HttpButlerEndpointTypeArgsInPath endpoint, HttpRequest request)
 	{
-		Assertions.assertTrue(endpoint.getAcceptance(request) > 0, "endpoint didn't accept request, but was supposed to:\n"+request);
+		Assertions.assertTrue(endpoint.getAcceptance(request) > 0, "endpoint didn't accept request, but was supposed to:\n" + request);
 	}
 	
 	private void assertDoesNotAccept(HttpButlerEndpointTypeArgsInPath endpoint, HttpRequest request)
 	{
-		Assertions.assertEquals(0, endpoint.getAcceptance(request), "endpoint accepted request, but wasn't supposed to:\n"+request);
+		Assertions.assertEquals(0, endpoint.getAcceptance(request), "endpoint accepted request, but wasn't supposed to:\n" + request);
 	}
 	
 }
