@@ -6,7 +6,6 @@ import io.domisum.lib.auxiliumlib.annotations.API;
 import io.domisum.lib.auxiliumlib.util.StringListUtil;
 import io.domisum.lib.auxiliumlib.util.StringUtil;
 import io.domisum.lib.httpbutler.exceptions.HttpBadRequest;
-import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
@@ -235,12 +234,12 @@ public class HttpRequest
 	}
 	
 	@API
-	public FormData getBodyAsMultipartForm()
+	public MultiPartForm getBodyAsMultipartForm()
 		throws IOException
 	{
 		if(formDataParser == null)
 			throw new IOException("Form data absent or invalid");
-		return formDataParser.parseBlocking();
+		return new MultiPartForm(formDataParser.parseBlocking());
 	}
 	
 	@Override
