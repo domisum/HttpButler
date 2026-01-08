@@ -6,17 +6,16 @@ import io.domisum.lib.auxiliumlib.annotations.API;
 import io.domisum.lib.auxiliumlib.util.StringListUtil;
 import io.domisum.lib.auxiliumlib.util.StringUtil;
 import io.domisum.lib.httpbutler.exceptions.HttpBadRequest;
+import io.undertow.server.handlers.form.FormData;
+import io.undertow.server.handlers.form.FormDataParser;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 public class HttpRequest
@@ -33,11 +32,14 @@ public class HttpRequest
 	
 	@Getter
 	private final InputStream body;
+	@Nullable private final FormDataParser formDataParser;
 	
 	
 	// INIT
-	public HttpRequest(HttpMethod method, String path,
-		Map<String, List<String>> queryParameters, Map<String, List<String>> headers, InputStream body)
+	public HttpRequest(
+		HttpMethod method, String path,
+		Map<String, List<String>> queryParameters, Map<String, List<String>> headers,
+		InputStream body, FormDataParser formDataParser)
 	{
 		this.method = method;
 		this.path = cleanUpPath(path);
@@ -53,6 +55,7 @@ public class HttpRequest
 		this.headers = Map.copyOf(headersCleaned);
 		
 		this.body = body;
+		this.formDataParser = formDataParser;
 	}
 	
 	
@@ -62,7 +65,7 @@ public class HttpRequest
 	{
 		var lines = new ArrayList<>();
 		
-		lines.add(method+" "+path);
+		lines.add(method + " " + path);
 		
 		lines.add("Query parameters:");
 		if(queryParameters.isEmpty())
@@ -70,7 +73,7 @@ public class HttpRequest
 		else
 			for(var queryParameter : queryParameters.entrySet())
 				for(String value : queryParameter.getValue())
-					lines.add(" - "+queryParameter.getKey()+"="+value);
+					lines.add(" - " + queryParameter.getKey() + "=" + value);
 		
 		lines.add("Headers:");
 		if(headers.isEmpty())
@@ -78,7 +81,7 @@ public class HttpRequest
 		else
 			for(var header : headers.entrySet())
 				for(String value : header.getValue())
-					lines.add(" - "+header.getKey()+": "+value);
+					lines.add(" - " + header.getKey() + ": " + value);
 		
 		lines.add("Body: (omitted)");
 		
@@ -94,7 +97,7 @@ public class HttpRequest
 		var pathSplit = StringUtil.splitByLiteral(path, "/");
 		
 		if(segmentIndex >= pathSplit.size())
-			throw new HttpBadRequest("Request did not contain path segment on index "+segmentIndex);
+			throw new HttpBadRequest("Request did not contain path segment on index " + segmentIndex);
 		
 		return pathSplit.get(segmentIndex);
 	}
@@ -231,11 +234,22 @@ public class HttpRequest
 		return IOUtils.toByteArray(body);
 	}
 	
+	@API
+	public FormData getBodyAsMultipartForm()
+		throws IOException
+	{
+		if(formDataParser == null)
+			throw new IOException("Form data absent or invalid");
+		return formDataParser.parseBlocking();
+	}
+	
 	@Override
 	public void close()
 		throws IOException
 	{
 		body.close();
+		if(formDataParser != null)
+			formDataParser.close();
 	}
 	
 	
@@ -245,7 +259,7 @@ public class HttpRequest
 		if(path.startsWith("/"))
 			path = path.substring(1);
 		if(path.endsWith("/"))
-			path = path.substring(0, path.length()-1);
+			path = path.substring(0, path.length() - 1);
 		
 		return path;
 	}

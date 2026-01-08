@@ -13,6 +13,7 @@ import io.domisum.lib.httpbutler.request.HttpRequest;
 import io.undertow.Undertow;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.BlockingHandler;
+import io.undertow.server.handlers.form.FormParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,12 +21,8 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @API
@@ -224,7 +221,6 @@ public class HttpButlerServer
 	{
 		var method = HttpMethod.fromName(exchange.getRequestMethod().toString());
 		String path = exchange.getRequestPath();
-		var body = exchange.getInputStream();
 		
 		var queryParameters = new HashMap<String, List<String>>();
 		for(var entry : exchange.getQueryParameters().entrySet())
@@ -234,7 +230,13 @@ public class HttpButlerServer
 		for(var headerValues : exchange.getRequestHeaders())
 			headers.put(headerValues.getHeaderName().toString(), List.copyOf(headerValues));
 		
-		return new HttpRequest(method, path, queryParameters, headers, body);
+		boolean isMultipartForm = headers.entrySet().stream()
+			.filter(e -> "Content-Type".equalsIgnoreCase(e.getKey()))
+			.flatMap(e -> e.getValue().stream())
+			.anyMatch(v -> v.toLowerCase().startsWith("multipart/form-data"));
+		var formDataParser = isMultipartForm ? FormParserFactory.builder().build().createParser(exchange) : null;
+		
+		return new HttpRequest(method, path, queryParameters, headers, exchange.getInputStream(), formDataParser);
 	}
 	
 	private HttpButlerEndpoint selectEndpoint(HttpRequest request)
@@ -257,18 +259,18 @@ public class HttpButlerServer
 			.max(Double::compareTo)
 			.orElseThrow();
 		var endpointsWithMaxAcceptance = endpointAcceptances.entrySet().stream()
-			.filter(e->e.getValue() == maxAcceptance)
+			.filter(e -> e.getValue() == maxAcceptance)
 			.map(Entry::getKey)
 			.collect(Collectors.toSet());
 		if(endpointsWithMaxAcceptance.size() > 1)
 		{
 			var tiedEndpointNames = endpointsWithMaxAcceptance.stream()
-				.map(e->e.getClass().getSimpleName())
+				.map(e -> e.getClass().getSimpleName())
 				.collect(Collectors.toSet());
-			String tieDisplayString = StringListUtil.list(tiedEndpointNames)+" (acceptance: "+maxAcceptance+")";
+			String tieDisplayString = StringListUtil.list(tiedEndpointNames) + " (acceptance: " + maxAcceptance + ")";
 			
 			logger.error("Multiple endpoints tied for handling request: {}; request:\n{}", tieDisplayString, request);
-			throw new HttpInternalServerError("Multiple endpoints tied for handling this request: "+tieDisplayString);
+			throw new HttpInternalServerError("Multiple endpoints tied for handling this request: " + tieDisplayString);
 		}
 		
 		// one endpoint found
