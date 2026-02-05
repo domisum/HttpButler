@@ -2,12 +2,14 @@ package io.domisum.lib.httpbutler.responses;
 
 import io.domisum.lib.auxiliumlib.PHR;
 import io.domisum.lib.auxiliumlib.annotations.API;
+import io.domisum.lib.auxiliumlib.util.FileUtil;
 import io.domisum.lib.httpbutler.HttpResponse;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +38,14 @@ public class HttpResponseImage
 	@API
 	public static HttpResponseImage ofFormat(byte[] raw, String format)
 	{return new HttpResponseImage(contentTypeFromFormat(format), raw);}
+	
+	@API
+	public static HttpResponseImage ofFile(File file)
+	{
+		String contentType = contentTypeFromFormat(FileUtil.getExtension(file));
+		byte[] raw = FileUtil.readRaw(file);
+		return new HttpResponseImage(contentType, raw);
+	}
 	
 	@API
 	public static HttpResponseImage png(byte[] rawPng)
