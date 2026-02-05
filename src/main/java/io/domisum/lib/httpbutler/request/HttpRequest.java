@@ -21,6 +21,11 @@ public class HttpRequest
 	implements AutoCloseable
 {
 	
+	// CONSTANTS
+	private final Collection<String> FLAG_TRUE_LOWER_CASE = Set.of("1", "true", "t");
+	private final Collection<String> FLAG_FALSE_LOWER_CASE = Set.of("0", "false", "f");
+	
+	
 	@Getter
 	private final HttpMethod method;
 	@Getter
@@ -138,7 +143,7 @@ public class HttpRequest
 		var parameterValues = getQueryParameterValues(key);
 		
 		if(parameterValues.size() > 1)
-			throw new HttpBadRequest(PHR.r("Request contained multiple values for paramenter '{}' but only one is expected", key));
+			throw tooManyParameterValues(key);
 		if(parameterValues.isEmpty())
 			throw new HttpBadRequest(PHR.r("Expected value for parameter '{}' but none was provided", key));
 		
@@ -192,6 +197,28 @@ public class HttpRequest
 			String error = PHR.r("Invalid value for parameter '{}', given: '{}', problem: {}", key, parameterValueOptional, e.getMessage());
 			throw new HttpBadRequest(error);
 		}
+	}
+	
+	public boolean parseQueryParameterFlag(String key, boolean defaultValue)
+		throws HttpBadRequest
+	{
+		var values = getQueryParameterValues(key);
+		if(values.size() > 1)
+			throw tooManyParameterValues(key);
+		if(values.isEmpty())
+			return defaultValue;
+		String value = values.get(0);
+		
+		String wip = value;
+		if(wip == null || wip.isBlank())
+			return true;
+		wip = wip.strip().toLowerCase();
+		if(FLAG_TRUE_LOWER_CASE.contains(wip))
+			return true;
+		if(FLAG_FALSE_LOWER_CASE.contains(wip))
+			return false;
+		
+		throw new HttpBadRequest(PHR.r("Failed to parse flag '{}' with value '{}'", key, value));
 	}
 	
 	
@@ -262,5 +289,8 @@ public class HttpRequest
 		
 		return path;
 	}
+	
+	private static HttpBadRequest tooManyParameterValues(String key)
+	{return new HttpBadRequest(PHR.r("Request contained multiple values for parameter '{}' but only one is expected", key));}
 	
 }
