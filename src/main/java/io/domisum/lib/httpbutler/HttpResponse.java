@@ -7,11 +7,16 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class HttpResponse
 {
+	
+	// CONSTANTS
+	private static final long SECONDS_PER_YEAR = 365L * 24 * 60 * 60;
+	
 	
 	// GENERAL RESPONSE
 	private final List<Duo<String>> headers = new ArrayList<>();
@@ -19,16 +24,44 @@ public abstract class HttpResponse
 	
 	// INTERFACE
 	@API
-	public void addHeader(String key, String value) {headers.add(new Duo<>(key, value));}
+	public HttpResponse addHeader(String key, String value)
+	{
+		headers.add(new Duo<>(key, value));
+		return this;
+	}
 	
 	@API
-	public void asDownload(String fileName) {setContentDisposition("attachment", fileName);}
+	public HttpResponse asDownload(String fileName)
+	{
+		setContentDisposition("attachment", fileName);
+		return this;
+	}
 	
 	@API
-	public void displayInline(String fileName) {setContentDisposition("inline", fileName);}
+	public HttpResponse displayInline(String fileName)
+	{
+		setContentDisposition("inline", fileName);
+		return this;
+	}
 	
 	@API
-	public void cacheImmutable() {setCacheControl("public,max-age=31536000,immutable");}
+	public HttpResponse cacheImmutable()
+	{
+		setCacheControl("public,immutable,max-age=" + SECONDS_PER_YEAR);
+		return this;
+	}
+	
+	@API
+	public HttpResponse cacheFor(Duration maxAge)
+	{
+		if(maxAge.isNegative())
+			maxAge = Duration.ZERO;
+		if(maxAge.getSeconds() > SECONDS_PER_YEAR)
+			maxAge = Duration.ofSeconds(SECONDS_PER_YEAR);
+		
+		setCacheControl("public,max-age=" + maxAge.getSeconds());
+		return this;
+	}
 	
 	
 	// INTERNAL INTERFACE
