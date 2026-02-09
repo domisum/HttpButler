@@ -139,11 +139,12 @@ public class HttpRequest
 	public String getQueryParameterValue(String key)
 		throws HttpBadRequest
 	{
-		key = key.toLowerCase();
-		var parameterValues = getQueryParameterValues(key);
+		String wip = key;
+		wip = wip.toLowerCase();
+		var parameterValues = getQueryParameterValues(wip);
 		
 		if(parameterValues.size() > 1)
-			throw tooManyParameterValues(key);
+			throw tooManyParameterValues(wip);
 		if(parameterValues.isEmpty())
 			throw new HttpBadRequest(PHR.r("Expected value for parameter '{}' but none was provided", key));
 		
